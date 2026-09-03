@@ -65,25 +65,35 @@ export default function Sidebar({ activeRoute, isOpen, onClose, onNavigate, onNe
 
   return (
     <div
-      className={`fixed inset-y-0 left-0 z-30 w-64 bg-sidebar border-r border-sidebar-border transform transition-transform duration-300 ease-in-out md:relative md:translate-x-0 flex flex-col ${
-        isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+      className={`fixed inset-y-0 left-0 z-30 w-72 bg-sidebar border-r border-sidebar-border transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 flex flex-col ${
+        isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}
     >
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-sidebar-border">
-        <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center mr-3">
+        <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center mr-3 flex-shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-white">
             <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
           </svg>
         </div>
         <span className="font-bold text-lg text-foreground tracking-tight">EDU AI</span>
+        {/* Close button for mobile/tablet */}
+        <button
+          onClick={onClose}
+          className="ml-auto p-1.5 rounded-lg text-muted-foreground hover:bg-muted lg:hidden"
+          aria-label="Close sidebar"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
       </div>
 
       {/* New Lesson Button */}
       <div className="p-4">
         <button
           onClick={handleNewLesson}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl transition-all font-semibold text-sm bg-primary text-white hover:bg-primary/90"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl transition-all font-semibold text-sm bg-primary text-white hover:bg-primary/90 active:scale-95"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
             <path d="M5 12h14" /><path d="M12 5v14" />
@@ -167,7 +177,7 @@ function SidebarButton({ icon, label, onClick, active }: SidebarButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 group text-left ${
+      className={`w-full flex items-center p-3 rounded-lg transition-all duration-200 group text-left active:scale-95 ${
         active ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted'
       }`}
     >

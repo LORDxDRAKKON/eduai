@@ -391,34 +391,34 @@ function AiTutorView({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex flex-col h-full">
       <ViewHeader onBack={onBack} icon={<BotIcon />} title="AI Tutor" subtitle="Ask me anything about your studies" />
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-6 text-center">
-            <div className="h-16 w-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <BotIcon className="w-7 h-7 text-primary" />
+          <div className="flex flex-col items-center justify-center h-full gap-4 md:gap-6 text-center px-2">
+            <div className="h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <BotIcon className="w-6 h-6 md:w-7 md:h-7 text-primary" />
             </div>
             <div>
-              <h3 className="font-bold text-foreground text-lg mb-1">Hi! I'm your AI Tutor</h3>
+              <h3 className="font-bold text-foreground text-base md:text-lg mb-1">Hi! I'm your AI Tutor</h3>
               <p className="text-muted-foreground text-sm max-w-sm">Ask me any question about your studies — I'll explain concepts, solve problems, and help you learn!</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
               {suggested.map(q => (
-                <button key={q} onClick={() => setInput(q)} className="text-left px-4 py-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition text-sm text-foreground">{q}</button>
+                <button key={q} onClick={() => setInput(q)} className="text-left px-3 py-2.5 md:px-4 md:py-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition text-sm text-foreground">{q}</button>
               ))}
             </div>
           </div>
         )}
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            {msg.role === 'assistant' && <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mr-2 mt-1 shrink-0"><BotIcon className="w-4 h-4 text-primary" /></div>}
-            <div className={`max-w-[75%] px-4 py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-primary text-white rounded-br-sm' : 'bg-card border border-border text-foreground rounded-bl-sm'}`}>
+            {msg.role === 'assistant' && <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mr-2 mt-1 shrink-0"><BotIcon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /></div>}
+            <div className={`max-w-[85%] md:max-w-[75%] px-3 py-2.5 md:px-4 md:py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-primary text-white rounded-br-sm' : 'bg-card border border-border text-foreground rounded-bl-sm'}`}>
               {msg.content}
             </div>
           </div>
         ))}
         {isLoading && messages[messages.length - 1]?.role === 'user' && (
           <div className="flex justify-start">
-            <div className="h-8 w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mr-2 mt-1 shrink-0"><BotIcon className="w-4 h-4 text-primary" /></div>
+            <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mr-2 mt-1 shrink-0"><BotIcon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /></div>
             <div className="bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3">
               <div className="flex gap-1">
                 {[0,150,300].map(d => <span key={d} className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
@@ -428,18 +428,18 @@ function AiTutorView({ onBack }: { onBack: () => void }) {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="p-4 border-t border-border bg-card shrink-0">
-        <div className="flex items-end gap-3 max-w-3xl mx-auto">
+      <div className="p-3 md:p-4 border-t border-border bg-card shrink-0">
+        <div className="flex items-end gap-2 md:gap-3 max-w-3xl mx-auto">
           <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-            placeholder="Ask your tutor anything... (Enter to send)" rows={1}
-            className="flex-1 px-4 py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm resize-none"
-            style={{ minHeight: '48px', maxHeight: '120px' }} />
+            placeholder="Ask your tutor anything..." rows={1}
+            className="flex-1 px-3 py-2.5 md:px-4 md:py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm resize-none"
+            style={{ minHeight: '44px', maxHeight: '120px' }} />
           <button onClick={handleSend} disabled={!input.trim() || isLoading}
-            className="h-12 w-12 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition shrink-0">
+            className="h-11 w-11 md:h-12 md:w-12 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition shrink-0 active:scale-95">
             {isLoading ? <SpinIcon className="h-4 w-4" /> : <SendIcon />}
           </button>
         </div>
-        <p className="text-center text-xs text-muted-foreground mt-2">Powered by Perplexity · Press Enter to send</p>
+        <p className="text-center text-xs text-muted-foreground mt-2 hidden sm:block">Powered by Perplexity · Press Enter to send</p>
       </div>
     </div>
   );
@@ -467,31 +467,32 @@ function CodePlaygroundView({ onBack }: { onBack: () => void }) {
   return (
     <div className="flex flex-col h-full">
       <ViewHeader onBack={onBack} icon={<CodeIcon />} title="Code Playground" subtitle="Write code and get AI review" />
-      <div className="flex-1 overflow-hidden flex flex-col md:flex-row gap-0">
+      <div className="flex-1 overflow-hidden flex flex-col lg:flex-row gap-0">
         {/* Editor */}
-        <div className="flex-1 flex flex-col border-r border-border">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-card">
+        <div className="flex-1 flex flex-col border-b lg:border-b-0 lg:border-r border-border" style={{ minHeight: '200px' }}>
+          <div className="flex items-center justify-between px-3 md:px-4 py-2.5 md:py-3 border-b border-border bg-card">
             <div className="flex items-center gap-3">
               <select value={language} onChange={e => setLanguage(e.target.value)}
-                className="text-sm border border-border rounded-lg px-3 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
+                className="text-sm border border-border rounded-lg px-2.5 py-1.5 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30">
                 {['Python','JavaScript','Java','C++','HTML'].map(l => <option key={l}>{l}</option>)}
               </select>
             </div>
             <button onClick={handleReview} disabled={isLoading || !code.trim()}
-              className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition">
-              {isLoading ? <><SpinIcon />Reviewing...</> : <><SparkleIcon className="w-4 h-4" />AI Review</>}
+              className="flex items-center gap-1.5 px-3 py-1.5 md:px-4 md:py-2 bg-primary text-white text-xs md:text-sm font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition active:scale-95">
+              {isLoading ? <><SpinIcon />Reviewing...</> : <><SparkleIcon className="w-3.5 h-3.5 md:w-4 md:h-4" />AI Review</>}
             </button>
           </div>
           <textarea value={code} onChange={e => setCode(e.target.value)}
-            className="flex-1 p-4 font-mono text-sm bg-gray-950 text-green-400 resize-none focus:outline-none"
+            className="flex-1 p-3 md:p-4 font-mono text-sm bg-gray-950 text-green-400 resize-none focus:outline-none"
+            style={{ minHeight: '180px' }}
             spellCheck={false} placeholder="Write your code here..." />
         </div>
         {/* Review */}
-        <div className="w-full md:w-96 flex flex-col bg-card">
-          <div className="px-4 py-3 border-b border-border">
+        <div className="w-full lg:w-96 flex flex-col bg-card" style={{ maxHeight: '40vh', minHeight: '120px' }}>
+          <div className="px-3 md:px-4 py-2.5 md:py-3 border-b border-border">
             <h3 className="font-semibold text-sm text-foreground">AI Code Review</h3>
           </div>
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="flex-1 overflow-y-auto p-3 md:p-4">
             {isLoading ? (
               <div className="flex flex-col items-center justify-center h-full gap-3">
                 <SpinIcon className="h-8 w-8 text-primary" />
@@ -501,7 +502,7 @@ function CodePlaygroundView({ onBack }: { onBack: () => void }) {
               <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap">{review}</div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-3 text-muted-foreground text-center">
-                <CodeIcon className="w-10 h-10 opacity-20" />
+                <CodeIcon className="w-8 h-8 md:w-10 md:h-10 opacity-20" />
                 <p className="text-sm">Write some code and click "AI Review" to get feedback</p>
               </div>
             )}
@@ -593,117 +594,114 @@ function NewLessonView({ onBack }: { onBack: () => void }) {
     <div className="flex flex-col h-full">
       <ViewHeader onBack={onBack} icon={<BookIcon />} title="New Lesson" subtitle="Personalized lessons for your class & stream" />
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-3xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Config Panel */}
-            <div className="space-y-5">
-              {/* Grade */}
-              <div className="bg-card rounded-2xl border border-border p-5">
-                <h3 className="font-semibold text-sm text-foreground mb-3">Class / Grade</h3>
-                <div className="flex flex-wrap gap-2">
-                  {NL_GRADES.map(g => (
-                    <button key={g} onClick={() => setGrade(g)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all ${grade === g ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'}`}>
-                      {g.replace('Grade ', '')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Stream (11-12 only) */}
-              {hasStream && (
-                <div className="bg-card rounded-2xl border border-border p-5">
-                  <h3 className="font-semibold text-sm text-foreground mb-3">Stream / Course</h3>
-                  <div className="flex gap-2">
-                    {NL_STREAMS[grade].map(s => (
-                      <button key={s} onClick={() => setStream(s)}
-                        className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all ${stream === s ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/50'}`}>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Subject */}
-              <div className="bg-card rounded-2xl border border-border p-5">
-                <h3 className="font-semibold text-sm text-foreground mb-3">Subject</h3>
-                <select value={subject} onChange={e => setSubject(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
-                  {subjects.map(s => <option key={s}>{s}</option>)}
-                </select>
-              </div>
-
-              {/* Language */}
-              <div className="bg-card rounded-2xl border border-border p-5">
-                <h3 className="font-semibold text-sm text-foreground mb-3">Language</h3>
-                <select value={language} onChange={e => setLanguage(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
-                  {['English','Hindi','Bengali','Telugu','Marathi','Tamil','Gujarati','Kannada'].map(l => <option key={l}>{l}</option>)}
-                </select>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+          <div className="space-y-4 md:space-y-5">
+            {/* Grade */}
+            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
+              <h3 className="font-semibold text-sm text-foreground mb-3">Class / Grade</h3>
+              <div className="flex flex-wrap gap-2">
+                {NL_GRADES.map(g => (
+                  <button key={g} onClick={() => setGrade(g)}
+                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all active:scale-95 ${grade === g ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'}`}>
+                    {g.replace('Grade ', '')}
+                  </button>
+                ))}
               </div>
             </div>
 
-            {/* Type + Topic */}
-            <div className="space-y-5">
-              {/* Explanation Type */}
-              <div className="bg-card rounded-2xl border border-border p-5">
-                <h3 className="font-semibold text-sm text-foreground mb-3">Type of Explanation</h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {EXPLANATION_TYPES.map(t => (
-                    <button key={t.id} onClick={() => setExplanationType(t.id)}
-                      className={`flex flex-col items-start gap-1 p-3 rounded-xl border-2 transition-all text-left ${explanationType === t.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40 hover:bg-muted'}`}>
-                      <span className="text-lg">{t.emoji}</span>
-                      <span className={`text-xs font-bold ${explanationType === t.id ? 'text-primary' : 'text-foreground'}`}>{t.label}</span>
-                      <span className="text-xs text-muted-foreground leading-tight">{t.desc}</span>
+            {/* Stream (11-12 only) */}
+            {hasStream && (
+              <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
+                <h3 className="font-semibold text-sm text-foreground mb-3">Stream / Course</h3>
+                <div className="flex gap-2">
+                  {NL_STREAMS[grade].map(s => (
+                    <button key={s} onClick={() => setStream(s)}
+                      className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all active:scale-95 ${stream === s ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/50'}`}>
+                      {s}
                     </button>
                   ))}
                 </div>
               </div>
+            )}
 
-              {/* Topic */}
-              <div className="bg-card rounded-2xl border border-border p-5">
-                <h3 className="font-semibold text-sm text-foreground mb-1">Topic / Chapter</h3>
-                <p className="text-xs text-muted-foreground mb-3">Enter the topic you want to learn about</p>
-                <textarea value={topic} onChange={e => setTopic(e.target.value)} rows={3}
-                  placeholder="e.g. Laws of Motion, Photosynthesis, French Revolution..."
-                  className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none mb-3" />
-                <button onClick={handleGenerate} disabled={isLoading || !topic.trim()}
-                  className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition">
-                  {isLoading
-                    ? <><SpinIcon />Generating {selectedType?.label}...</>
-                    : <><SparkleIcon className="w-4 h-4" />Generate {selectedType?.label}</>}
-                </button>
-              </div>
+            {/* Subject */}
+            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
+              <h3 className="font-semibold text-sm text-foreground mb-3">Subject</h3>
+              <select value={subject} onChange={e => setSubject(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                {subjects.map(s => <option key={s}>{s}</option>)}
+              </select>
+            </div>
+
+            {/* Language */}
+            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
+              <h3 className="font-semibold text-sm text-foreground mb-3">Language</h3>
+              <select value={language} onChange={e => setLanguage(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                {['English','Hindi','Bengali','Telugu','Marathi','Tamil','Gujarati','Kannada'].map(l => <option key={l}>{l}</option>)}
+              </select>
             </div>
           </div>
 
-          {/* Generated Lesson */}
-          {isLoading && !lessonContent && (
-            <div className="mt-6 bg-card rounded-2xl border border-border p-8 text-center">
-              <SpinIcon className="animate-spin h-8 w-8 text-primary mx-auto mb-3" />
-              <p className="text-sm text-muted-foreground">Creating your personalized {selectedType?.label?.toLowerCase()}...</p>
-            </div>
-          )}
-          {lessonContent && (
-            <div className="mt-6 bg-card rounded-2xl border border-border p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl">{selectedType?.emoji}</span>
-                  <div>
-                    <h3 className="font-bold text-foreground text-sm">{selectedType?.label}: {topic}</h3>
-                    <p className="text-xs text-muted-foreground">{grade}{hasStream ? ` · ${stream}` : ''} · {subject} · {language}</p>
-                  </div>
-                </div>
-                <button onClick={handleGenerate} disabled={isLoading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition">
-                  <RefreshIcon /> Regenerate
-                </button>
+          {/* Type + Topic */}
+          <div className="space-y-4 md:space-y-5">
+            {/* Explanation Type */}
+            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
+              <h3 className="font-semibold text-sm text-foreground mb-3">Type of Explanation</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {EXPLANATION_TYPES.map(t => (
+                  <button key={t.id} onClick={() => setExplanationType(t.id)}
+                    className={`flex flex-col items-start gap-1 p-2.5 md:p-3 rounded-xl border-2 transition-all text-left active:scale-95 ${explanationType === t.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40 hover:bg-muted'}`}>
+                    <span className="text-base md:text-lg">{t.emoji}</span>
+                    <span className={`text-xs font-bold ${explanationType === t.id ? 'text-primary' : 'text-foreground'}`}>{t.label}</span>
+                    <span className="text-xs text-muted-foreground leading-tight hidden sm:block">{t.desc}</span>
+                  </button>
+                ))}
               </div>
-              <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap border-t border-border pt-4">{lessonContent}</div>
             </div>
-          )}
+
+            {/* Topic */}
+            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
+              <h3 className="font-semibold text-sm text-foreground mb-1">Topic / Chapter</h3>
+              <p className="text-xs text-muted-foreground mb-3">Enter the topic you want to learn about</p>
+              <textarea value={topic} onChange={e => setTopic(e.target.value)} rows={3}
+                placeholder="e.g. Laws of Motion, Photosynthesis, French Revolution..."
+                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none mb-3" />
+              <button onClick={handleGenerate} disabled={isLoading || !topic.trim()}
+                className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition active:scale-95">
+                {isLoading
+                  ? <><SpinIcon />Generating {selectedType?.label}...</>
+                  : <><SparkleIcon className="w-4 h-4" />Generate {selectedType?.label}</>}
+              </button>
+            </div>
+          </div>
         </div>
+
+        {/* Generated Lesson */}
+        {isLoading && !lessonContent && (
+          <div className="mt-6 bg-card rounded-2xl border border-border p-8 text-center">
+            <SpinIcon className="animate-spin h-8 w-8 text-primary mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">Creating your personalized {selectedType?.label?.toLowerCase()}...</p>
+          </div>
+        )}
+        {lessonContent && (
+          <div className="mt-6 bg-card rounded-2xl border border-border p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{selectedType?.emoji}</span>
+                <div>
+                  <h3 className="font-bold text-foreground text-sm">{selectedType?.label}: {topic}</h3>
+                  <p className="text-xs text-muted-foreground">{grade}{hasStream ? ` · ${stream}` : ''} · {subject} · {language}</p>
+                </div>
+              </div>
+              <button onClick={handleGenerate} disabled={isLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition">
+                <RefreshIcon /> Regenerate
+              </button>
+            </div>
+            <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap border-t border-border pt-4">{lessonContent}</div>
+          </div>
+        )}
       </div>
     </div>
   );

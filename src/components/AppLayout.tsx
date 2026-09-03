@@ -41,9 +41,12 @@ export default function AppLayout({ children, activeRoute, onNewLesson, onNaviga
         onOpenProfile={onOpenProfile}
       />
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-foreground/20 z-20 md:hidden backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 bg-foreground/30 z-20 lg:hidden backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
-      <div className="flex-1 flex flex-col h-full w-full relative overflow-hidden">
+      <div className="flex-1 flex flex-col h-full w-full relative overflow-hidden min-w-0">
         <Topbar onMenuClick={() => setSidebarOpen(true)} onOpenProfile={onOpenProfile} onOpenSettings={onOpenSettings} />
         <div className="flex-1 overflow-hidden bg-background">
           {children}

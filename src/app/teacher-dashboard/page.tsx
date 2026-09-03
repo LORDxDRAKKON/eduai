@@ -765,6 +765,7 @@ export default function TeacherDashboardPage() {
   const [profile, setProfile] = useState<TeacherProfile | null>(null);
   const [greeting, setGreeting] = useState('Good Morning');
   const [activeView, setActiveView] = useState<MainView>('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const h = new Date().getHours();
@@ -876,18 +877,18 @@ export default function TeacherDashboardPage() {
       default: return (
         <div className="max-w-5xl mx-auto">
           {/* Hero Greeting */}
-          <div className="flex flex-col items-center text-center mb-10">
-            <div className="w-16 h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-4">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <div className="flex flex-col items-center text-center mb-6 md:mb-10">
+            <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-indigo-50 flex items-center justify-center mb-3 md:mb-4">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z" />
               </svg>
             </div>
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-2">{greeting}, {teacherName}!</h1>
-            <p className="text-gray-500 text-base">Create lessons, manage students, and teach with AI.</p>
+            <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 mb-1 md:mb-2">{greeting}, {teacherName}!</h1>
+            <p className="text-gray-500 text-sm md:text-base">Create lessons, manage students, and teach with AI.</p>
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
             {[
               { label: 'Assignments', value: '2', icon: '📋', color: 'bg-blue-50', onClick: () => setActiveView('assignments') },
               { label: 'Students', value: '4', icon: '👥', color: 'bg-emerald-50', onClick: () => setActiveView('students') },
@@ -897,21 +898,21 @@ export default function TeacherDashboardPage() {
               <button
                 key={stat.label}
                 onClick={stat.onClick}
-                className={`${stat.color} rounded-2xl p-5 text-left hover:shadow-md hover:-translate-y-0.5 transition-all border border-transparent hover:border-gray-200`}
+                className={`${stat.color} rounded-2xl p-4 md:p-5 text-left hover:shadow-md hover:-translate-y-0.5 transition-all border border-transparent hover:border-gray-200 active:scale-95`}
               >
-                <p className="text-2xl mb-2">{stat.icon}</p>
-                <p className="text-2xl font-extrabold text-gray-900">{stat.value}</p>
+                <p className="text-xl md:text-2xl mb-1 md:mb-2">{stat.icon}</p>
+                <p className="text-xl md:text-2xl font-extrabold text-gray-900">{stat.value}</p>
                 <p className="text-xs text-gray-500 font-medium">{stat.label}</p>
               </button>
             ))}
           </div>
 
           {/* BUILD YOUR SKILLS */}
-          <div className="mb-8">
-            <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
+          <div className="mb-6 md:mb-8">
+            <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
               <span>🚀</span> BUILD YOUR SKILLS
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {[
                 { id: 'ai-tutor' as MainView, label: 'AI Tutor', desc: 'Chat & learn anything', iconBg: 'bg-indigo-100', iconColor: 'text-indigo-500', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M8 10h8M8 14h5" /></svg> },
                 { id: 'code-playground' as MainView, label: 'Code Playground', desc: 'Write & review code', iconBg: 'bg-teal-100', iconColor: 'text-teal-500', icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg> },
@@ -921,12 +922,12 @@ export default function TeacherDashboardPage() {
                 <button
                   key={card.id}
                   onClick={() => setActiveView(card.id)}
-                  className="bg-white border border-gray-200 rounded-2xl p-5 text-left hover:shadow-md hover:-translate-y-0.5 transition-all"
+                  className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5 text-left hover:shadow-md hover:-translate-y-0.5 transition-all active:scale-95"
                 >
-                  <div className={`w-12 h-12 rounded-full ${card.iconBg} ${card.iconColor} flex items-center justify-center mb-4`}>
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${card.iconBg} ${card.iconColor} flex items-center justify-center mb-3 md:mb-4`}>
                     {card.icon}
                   </div>
-                  <p className="font-bold text-gray-900 text-sm mb-1">{card.label}</p>
+                  <p className="font-bold text-gray-900 text-sm mb-0.5 md:mb-1">{card.label}</p>
                   <p className="text-xs text-gray-500">{card.desc}</p>
                 </button>
               ))}
@@ -935,20 +936,20 @@ export default function TeacherDashboardPage() {
 
           {/* GENERATE CONTENT */}
           <div>
-            <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h2 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-3 md:mb-4 flex items-center gap-2">
               <span>🎨</span> GENERATE CONTENT
             </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {generateContentCards.map(card => (
                 <Link
                   key={card.id}
                   href={card.href}
-                  className="bg-white border border-gray-200 rounded-2xl p-5 text-left hover:shadow-md hover:-translate-y-0.5 transition-all block"
+                  className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5 text-left hover:shadow-md hover:-translate-y-0.5 transition-all block active:scale-95"
                 >
-                  <div className={`w-12 h-12 rounded-full ${card.iconBg} ${card.iconColor} flex items-center justify-center mb-4`}>
+                  <div className={`w-10 h-10 md:w-12 md:h-12 rounded-full ${card.iconBg} ${card.iconColor} flex items-center justify-center mb-3 md:mb-4`}>
                     {card.icon}
                   </div>
-                  <p className="font-bold text-gray-900 text-sm mb-1">{card.label}</p>
+                  <p className="font-bold text-gray-900 text-sm mb-0.5 md:mb-1">{card.label}</p>
                   <p className="text-xs text-gray-500">{card.desc}</p>
                 </Link>
               ))}
@@ -961,23 +962,40 @@ export default function TeacherDashboardPage() {
 
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* ── Mobile Overlay ── */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-20 lg:hidden backdrop-blur-sm"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside className="w-64 bg-white border-r border-gray-200 flex flex-col flex-shrink-0">
+      <aside className={`fixed inset-y-0 left-0 z-30 w-72 bg-white border-r border-gray-200 flex flex-col flex-shrink-0 transform transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}`}>
         {/* Logo */}
-        <div className="h-16 flex items-center px-5 border-b border-gray-100 gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+        <div className="h-14 md:h-16 flex items-center px-5 border-b border-gray-100 gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center flex-shrink-0">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" fill="white" stroke="white" strokeWidth="1" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="font-bold text-gray-900 text-base tracking-tight">EDU AI</span>
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="ml-auto p-1.5 rounded-lg text-gray-400 hover:bg-gray-100 lg:hidden"
+            aria-label="Close sidebar"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 6 6 18M6 6l12 12"/>
+            </svg>
+          </button>
         </div>
 
         {/* New Lesson Button */}
         <div className="px-4 pt-5 pb-4">
           <button
-            onClick={() => setActiveView('new-lesson')}
-            className="w-full flex items-center justify-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold text-sm rounded-xl py-2.5 transition-colors"
+            onClick={() => { setActiveView('new-lesson'); setSidebarOpen(false); }}
+            className="w-full flex items-center justify-center gap-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-semibold text-sm rounded-xl py-2.5 transition-colors active:scale-95"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
@@ -993,8 +1011,8 @@ export default function TeacherDashboardPage() {
             {sidebarItems.map(item => (
               <button
                 key={item.id}
-                onClick={() => setActiveView(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                onClick={() => { setActiveView(item.id); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   activeView === item.id ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
@@ -1012,8 +1030,8 @@ export default function TeacherDashboardPage() {
             {skillItems.map(item => (
               <button
                 key={item.id}
-                onClick={() => setActiveView(item.id)}
-                className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                onClick={() => { setActiveView(item.id); setSidebarOpen(false); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   activeView === item.id ? 'bg-indigo-50 text-indigo-700 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                 }`}
               >
@@ -1045,59 +1063,85 @@ export default function TeacherDashboardPage() {
       </aside>
 
       {/* ── Main ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Topbar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 gap-4 flex-shrink-0">
-          {/* Breadcrumb */}
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <button onClick={() => setActiveView('dashboard')} className="hover:text-gray-900 transition-colors font-medium">Dashboard</button>
-            {activeView !== 'dashboard' && (
-              <>
-                <span>/</span>
-                <span className="text-gray-900 font-semibold capitalize">{activeView.replace(/-/g, ' ')}</span>
-              </>
-            )}
+        <header className="h-14 md:h-16 bg-white border-b border-gray-200 flex items-center justify-between px-3 md:px-6 gap-2 flex-shrink-0">
+          <div className="flex items-center gap-2 min-w-0">
+            {/* Hamburger for mobile/tablet */}
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition flex-shrink-0"
+              aria-label="Open menu"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" />
+              </svg>
+            </button>
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-1.5 text-sm text-gray-500 min-w-0">
+              <button onClick={() => setActiveView('dashboard')} className="hover:text-gray-900 transition-colors font-medium hidden sm:block flex-shrink-0">Dashboard</button>
+              {activeView !== 'dashboard' && (
+                <>
+                  <span className="hidden sm:block flex-shrink-0">/</span>
+                  <span className="text-gray-900 font-semibold capitalize truncate">{activeView.replace(/-/g, ' ')}</span>
+                </>
+              )}
+              {activeView === 'dashboard' && (
+                <span className="text-gray-900 font-semibold sm:hidden">Dashboard</span>
+              )}
+            </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
             {/* Admin Panel Button */}
             <Link
               href="/teacher-admin"
-              className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" />
               </svg>
-              Admin Panel
+              <span className="hidden md:inline">Admin Panel</span>
+              <span className="md:hidden">Admin</span>
             </Link>
 
             {/* Notification Bell */}
             <button className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
             </button>
 
             {/* Avatar */}
-            <div className="w-9 h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
+            <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
               {teacherInitial}
             </div>
 
             {/* Logout */}
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors"
+              className="hidden sm:flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
               </svg>
               Logout
             </button>
+            {/* Mobile logout icon only */}
+            <button
+              onClick={handleSignOut}
+              className="sm:hidden p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500"
+              title="Logout"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" />
+              </svg>
+            </button>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 px-8 py-8">
+        <main className="flex-1 overflow-y-auto bg-gray-50 px-4 py-4 md:px-6 md:py-6 lg:px-8 lg:py-8">
           {renderMainContent()}
         </main>
       </div>
