@@ -1,0 +1,57 @@
+{
+    "name": "EDU GENIUS AI",
+    "short_name": "EduGenius",
+    "description": "Voice-First AI Educational Assistant for rural, multi-grade classrooms",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#6366f1",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "categories": [
+        "education",
+        "productivity"
+    ],
+    "icons": [
+        {
+            "src": "/assets/images/app_logo.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/assets/images/app_logo.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "screenshots": [],
+    "shortcuts": [
+        {
+            "name": "AI Tutor",
+            "short_name": "Tutor",
+            "description": "Open AI Tutor chat",
+            "url": "/?view=ai-tutor",
+            "icons": [
+                {
+                    "src": "/assets/images/app_logo.png",
+                    "sizes": "192x192"
+                }
+            ]
+        },
+        {
+            "name": "Content Generator",
+            "short_name": "Generate",
+            "description": "Generate educational content",
+            "url": "/content-generation-screen",
+            "icons": [
+                {
+                    "src": "/assets/images/app_logo.png",
+                    "sizes": "192x192"
+                }
+            ]
+        }
+    ]
+}
