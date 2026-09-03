@@ -38,7 +38,7 @@ function OfflineAnswerSystem() {
   const [offlineResults, setOfflineResults] = useState<typeof OFFLINE_QA>([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [hasSearched, setHasSearched] = useState(false);
-  const { response, isLoading, error, sendMessage } = useChat('PERPLEXITY', 'sonar-pro', false);
+  const { response, isLoading, error, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
 
   const categories = ['All', ...Array.from(new Set(OFFLINE_QA.map(q => q.category)))];
 
@@ -190,7 +190,7 @@ function AiTutorPanel() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'sonar-pro', true);
+  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', true);
   const [pendingResponse, setPendingResponse] = useState('');
 
   useEffect(() => {
@@ -284,7 +284,7 @@ function CodePlaygroundPanel() {
   const [code, setCode] = useState('// Write your code here\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n\nconsole.log(greet("World"));');
   const [language, setLanguage] = useState('JavaScript');
   const [review, setReview] = useState('');
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'sonar-pro', false);
+  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
 
   useEffect(() => {
     if (response) setReview(response);
@@ -359,7 +359,7 @@ function FlashcardsPanel() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'sonar-pro', false);
+  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
 
   useEffect(() => {
     if (response && !isLoading) {
@@ -490,7 +490,7 @@ function DailyChallengesPanel() {
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [generating, setGenerating] = useState(false);
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'sonar-pro', false);
+  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
 
   useEffect(() => {
     if (response && !isLoading) {
@@ -679,7 +679,7 @@ function NewLessonPanel() {
   const [type, setType] = useState('Explanation');
   const [language, setLanguage] = useState('English');
   const [lessonContent, setLessonContent] = useState('');
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'sonar-pro', false);
+  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
 
   const hasStream = NLP_STREAMS[grade] !== undefined;
   const subjectKey = hasStream ? `${grade} ${stream}` : grade;
