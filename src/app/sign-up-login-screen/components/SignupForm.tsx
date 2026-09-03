@@ -48,20 +48,28 @@ export default function SignupForm({ onSwitchToLogin }: SignupFormProps) {
   const onSubmit = async (data: SignupValues) => {
     setLoading(true);
     try {
-      const authData = await signUp(data.email, data.password, {
-        fullName: data.name,
+      // Sanitize name to prevent XSS
+      const safeName = data.name.replace(/[<>]/g, '').trim();
+      if (safeName.length < 2) {
+        setError('name', { message: 'Name must be at least 2 characters' });
+        setLoading(false);
+        return;
+      }
+
+      const authData = await signUp(data.email.trim().toLowerCase(), data.password, {
+        fullName: safeName,
         role,
       });
       // Upsert role into user_profiles after signup
       if (authData?.user?.id) {
         await supabase.from('user_profiles').upsert({
           id: authData.user.id,
-          email: data.email,
-          full_name: data.name,
+          email: data.email.trim().toLowerCase(),
+          full_name: safeName,
           role,
         }, { onConflict: 'id' });
       }
-      toast.success(`Welcome to EduAI, ${data.name.split(' ')[0]}! 🎉`);
+      toast.success(`Welcome to EduAI, ${safeName.split(' ')[0]}! 🎉`);
       if (role === 'teacher') {
         router.push('/teacher-dashboard');
       } else {

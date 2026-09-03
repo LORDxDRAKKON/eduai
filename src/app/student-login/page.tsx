@@ -5,6 +5,32 @@ import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
 
+// Client-side rate limit: track attempts in sessionStorage
+function getLoginAttempts(): number {
+  if (typeof window === 'undefined') return 0;
+  const data = sessionStorage.getItem('login_attempts');
+  if (!data) return 0;
+  try {
+    const parsed = JSON.parse(data);
+    if (parsed.resetAt < Date.now()) { sessionStorage.removeItem('login_attempts'); return 0; }
+    return parsed.count;
+  } catch { return 0; }
+}
+
+function incrementLoginAttempts(): number {
+  if (typeof window === 'undefined') return 0;
+  const count = getLoginAttempts() + 1;
+  const resetAt = Date.now() + 15 * 60 * 1000;
+  sessionStorage.setItem('login_attempts', JSON.stringify({ count, resetAt }));
+  return count;
+}
+
+function resetLoginAttempts() {
+  if (typeof window !== 'undefined') sessionStorage.removeItem('login_attempts');
+}
+
+const MAX_LOGIN_ATTEMPTS = 10;
+
 export default function StudentLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,9 +44,28 @@ export default function StudentLoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Client-side rate limit check
+    const attempts = getLoginAttempts();
+    if (attempts >= MAX_LOGIN_ATTEMPTS) {
+      setError('Too many login attempts. Please wait 15 minutes before trying again.');
+      return;
+    }
+
+    // Basic input validation
+    const trimmedEmail = email.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const authData = await signIn(email, password);
+      const authData = await signIn(trimmedEmail, password);
       let role = 'student';
       if (authData?.user?.id) {
         const { data: profile } = await supabase.from('user_profiles').select('role').eq('id', authData.user.id).single();
@@ -32,9 +77,11 @@ export default function StudentLoginPage() {
         setLoading(false);
         return;
       }
+      resetLoginAttempts();
       router.push('/');
       router.refresh();
     } catch (err: any) {
+      incrementLoginAttempts();
       setError(err?.message || 'Invalid email or password');
     } finally {
       setLoading(false);

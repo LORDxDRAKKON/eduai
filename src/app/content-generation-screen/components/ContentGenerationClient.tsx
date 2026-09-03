@@ -55,7 +55,7 @@ export default function ContentGenerationClient() {
     try {
       const prompt = buildPrompt(cfg);
 
-      // Use Perplexity for all content generation
+      // Use the secure /api/ai/generate endpoint (has auth + rate limiting)
       const provider = 'PERPLEXITY';
       const model = 'perplexity/sonar-pro';
 

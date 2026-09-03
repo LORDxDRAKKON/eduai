@@ -1,6 +1,7 @@
 import { callAIEndpoint } from './aiClient';
 
-const ENDPOINT = '/api/ai/chat-completion';
+// Use the security-hardened endpoint (rate limiting + auth + input validation)
+const ENDPOINT = '/api/ai/generate';
 
 export async function getChatCompletion(
   provider: string,
