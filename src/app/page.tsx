@@ -591,117 +591,134 @@ function NewLessonView({ onBack }: { onBack: () => void }) {
   const selectedType = EXPLANATION_TYPES.find(t => t.id === explanationType);
 
   return (
-    <div className="flex flex-col h-full">
-      <ViewHeader onBack={onBack} icon={<BookIcon />} title="New Lesson" subtitle="Personalized lessons for your class & stream" />
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          <div className="space-y-4 md:space-y-5">
-            {/* Grade */}
-            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Class / Grade</h3>
-              <div className="flex flex-wrap gap-2">
-                {NL_GRADES.map(g => (
-                  <button key={g} onClick={() => setGrade(g)}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all active:scale-95 ${grade === g ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/50 hover:text-foreground'}`}>
-                    {g.replace('Grade ', '')}
-                  </button>
-                ))}
-              </div>
-            </div>
+    <div className="flex flex-col h-full bg-gray-50">
+      {/* Header — teacher dashboard style */}
+      <div className="flex items-center gap-3 px-4 md:px-6 py-4 bg-white border-b border-gray-200 shrink-0">
+        <button onClick={onBack} className="h-9 w-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        </div>
+        <div>
+          <h2 className="font-extrabold text-gray-900 text-base leading-tight">New Lesson</h2>
+          <p className="text-xs text-gray-500">Personalized lessons for your grade & stream</p>
+        </div>
+      </div>
 
-            {/* Stream (11-12 only) */}
-            {hasStream && (
-              <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
-                <h3 className="font-semibold text-sm text-foreground mb-3">Stream / Course</h3>
-                <div className="flex gap-2">
-                  {NL_STREAMS[grade].map(s => (
-                    <button key={s} onClick={() => setStream(s)}
-                      className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all active:scale-95 ${stream === s ? 'bg-primary text-white border-primary' : 'border-border text-muted-foreground hover:border-primary/50'}`}>
-                      {s}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="max-w-4xl mx-auto space-y-5">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+            {/* Left column */}
+            <div className="space-y-4">
+              {/* Grade */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+                <h3 className="font-semibold text-sm text-gray-900 mb-3">Class / Grade</h3>
+                <div className="flex flex-wrap gap-2">
+                  {NL_GRADES.map(g => (
+                    <button key={g} onClick={() => setGrade(g)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all active:scale-95 ${grade === g ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 text-gray-500 hover:border-indigo-300 hover:text-gray-900'}`}>
+                      {g.replace('Grade ', '')}
                     </button>
                   ))}
                 </div>
               </div>
-            )}
 
-            {/* Subject */}
-            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Subject</h3>
-              <select value={subject} onChange={e => setSubject(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
-                {subjects.map(s => <option key={s}>{s}</option>)}
-              </select>
-            </div>
+              {/* Stream (11-12 only) */}
+              {hasStream && (
+                <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+                  <h3 className="font-semibold text-sm text-gray-900 mb-3">Stream / Course</h3>
+                  <div className="flex gap-2">
+                    {NL_STREAMS[grade].map(s => (
+                      <button key={s} onClick={() => setStream(s)}
+                        className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all active:scale-95 ${stream === s ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 text-gray-500 hover:border-indigo-300'}`}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
-            {/* Language */}
-            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Language</h3>
-              <select value={language} onChange={e => setLanguage(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
-                {['English','Hindi','Bengali','Telugu','Marathi','Tamil','Gujarati','Kannada'].map(l => <option key={l}>{l}</option>)}
-              </select>
-            </div>
-          </div>
+              {/* Subject */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+                <h3 className="font-semibold text-sm text-gray-900 mb-3">Subject</h3>
+                <select value={subject} onChange={e => setSubject(e.target.value)}
+                  className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                  {subjects.map(s => <option key={s}>{s}</option>)}
+                </select>
+              </div>
 
-          {/* Type + Topic */}
-          <div className="space-y-4 md:space-y-5">
-            {/* Explanation Type */}
-            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
-              <h3 className="font-semibold text-sm text-foreground mb-3">Type of Explanation</h3>
-              <div className="grid grid-cols-2 gap-2">
-                {EXPLANATION_TYPES.map(t => (
-                  <button key={t.id} onClick={() => setExplanationType(t.id)}
-                    className={`flex flex-col items-start gap-1 p-2.5 md:p-3 rounded-xl border-2 transition-all text-left active:scale-95 ${explanationType === t.id ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/40 hover:bg-muted'}`}>
-                    <span className="text-base md:text-lg">{t.emoji}</span>
-                    <span className={`text-xs font-bold ${explanationType === t.id ? 'text-primary' : 'text-foreground'}`}>{t.label}</span>
-                    <span className="text-xs text-muted-foreground leading-tight hidden sm:block">{t.desc}</span>
-                  </button>
-                ))}
+              {/* Language */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+                <h3 className="font-semibold text-sm text-gray-900 mb-3">Language</h3>
+                <select value={language} onChange={e => setLanguage(e.target.value)}
+                  className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+                  {['English','Hindi','Bengali','Telugu','Marathi','Tamil','Gujarati','Kannada'].map(l => <option key={l}>{l}</option>)}
+                </select>
               </div>
             </div>
 
-            {/* Topic */}
-            <div className="bg-card rounded-2xl border border-border p-4 md:p-5">
-              <h3 className="font-semibold text-sm text-foreground mb-1">Topic / Chapter</h3>
-              <p className="text-xs text-muted-foreground mb-3">Enter the topic you want to learn about</p>
-              <textarea value={topic} onChange={e => setTopic(e.target.value)} rows={3}
-                placeholder="e.g. Laws of Motion, Photosynthesis, French Revolution..."
-                className="w-full px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none mb-3" />
-              <button onClick={handleGenerate} disabled={isLoading || !topic.trim()}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition active:scale-95">
-                {isLoading
-                  ? <><SpinIcon />Generating {selectedType?.label}...</>
-                  : <><SparkleIcon className="w-4 h-4" />Generate {selectedType?.label}</>}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Generated Lesson */}
-        {isLoading && !lessonContent && (
-          <div className="mt-6 bg-card rounded-2xl border border-border p-8 text-center">
-            <SpinIcon className="animate-spin h-8 w-8 text-primary mx-auto mb-3" />
-            <p className="text-sm text-muted-foreground">Creating your personalized {selectedType?.label?.toLowerCase()}...</p>
-          </div>
-        )}
-        {lessonContent && (
-          <div className="mt-6 bg-card rounded-2xl border border-border p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">{selectedType?.emoji}</span>
-                <div>
-                  <h3 className="font-bold text-foreground text-sm">{selectedType?.label}: {topic}</h3>
-                  <p className="text-xs text-muted-foreground">{grade}{hasStream ? ` · ${stream}` : ''} · {subject} · {language}</p>
+            {/* Right column */}
+            <div className="space-y-4">
+              {/* Explanation Type */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+                <h3 className="font-semibold text-sm text-gray-900 mb-3">Type of Explanation</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {EXPLANATION_TYPES.map(t => (
+                    <button key={t.id} onClick={() => setExplanationType(t.id)}
+                      className={`flex flex-col items-start gap-1 p-2.5 md:p-3 rounded-xl border-2 transition-all text-left active:scale-95 ${explanationType === t.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'}`}>
+                      <span className="text-base md:text-lg">{t.emoji}</span>
+                      <span className={`text-xs font-bold ${explanationType === t.id ? 'text-indigo-600' : 'text-gray-900'}`}>{t.label}</span>
+                      <span className="text-xs text-gray-500 leading-tight hidden sm:block">{t.desc}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
-              <button onClick={handleGenerate} disabled={isLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition">
-                <RefreshIcon /> Regenerate
-              </button>
+
+              {/* Topic */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+                <h3 className="font-semibold text-sm text-gray-900 mb-1">Topic / Chapter</h3>
+                <p className="text-xs text-gray-500 mb-3">Enter the topic you want to learn about</p>
+                <textarea value={topic} onChange={e => setTopic(e.target.value)} rows={3}
+                  placeholder="e.g. Laws of Motion, Photosynthesis, French Revolution..."
+                  className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none mb-3" />
+                <button onClick={handleGenerate} disabled={isLoading || !topic.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50">
+                  {isLoading
+                    ? <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Generating {selectedType?.label}…</>
+                    : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Generate {selectedType?.label}</>}
+                </button>
+              </div>
             </div>
-            <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap border-t border-border pt-4">{lessonContent}</div>
           </div>
-        )}
+
+          {/* Generated Lesson */}
+          {isLoading && !lessonContent && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+              <svg className="animate-spin w-8 h-8 text-indigo-600 mx-auto mb-3" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+              <p className="text-sm text-gray-500">Creating your personalized {selectedType?.label?.toLowerCase()}...</p>
+            </div>
+          )}
+          {lessonContent && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">{selectedType?.emoji}</span>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-sm">{selectedType?.label}: {topic}</h3>
+                    <p className="text-xs text-gray-500">{grade}{hasStream ? ` · ${stream}` : ''} · {subject} · {language}</p>
+                  </div>
+                </div>
+                <button onClick={handleGenerate} disabled={isLoading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                  Regenerate
+                </button>
+              </div>
+              <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap border-t border-gray-100 pt-4">{lessonContent}</div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

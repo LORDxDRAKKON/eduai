@@ -638,34 +638,69 @@ function DailyChallengesPanel() {
 }
 
 // ── New Lesson Panel ───────────────────────────────────────────────────────
+const NLP_GRADES = ['Grade 1','Grade 2','Grade 3','Grade 4','Grade 5','Grade 6','Grade 7','Grade 8','Grade 9','Grade 10','Grade 11','Grade 12'];
+const NLP_STREAMS: Record<string, string[]> = {
+  'Grade 11': ['Science', 'Commerce', 'Arts'],
+  'Grade 12': ['Science', 'Commerce', 'Arts'],
+};
+const NLP_SUBJECTS_MAP: Record<string, string[]> = {
+  'Grade 1': ['English','Mathematics','Environmental Studies','Hindi'],
+  'Grade 2': ['English','Mathematics','Environmental Studies','Hindi'],
+  'Grade 3': ['English','Mathematics','Science','Hindi'],
+  'Grade 4': ['English','Mathematics','Science','Social Studies','Hindi'],
+  'Grade 5': ['English','Mathematics','Science','Social Studies','Hindi'],
+  'Grade 6': ['English','Mathematics','Science','Social Studies','Hindi','Sanskrit'],
+  'Grade 7': ['English','Mathematics','Science','Social Studies','Hindi','Sanskrit'],
+  'Grade 8': ['English','Mathematics','Science','Social Studies','Hindi','Sanskrit'],
+  'Grade 9': ['English','Mathematics','Physics','Chemistry','Biology','History','Geography','Economics','Hindi'],
+  'Grade 10': ['English','Mathematics','Physics','Chemistry','Biology','History','Geography','Economics','Hindi'],
+  'Grade 11 Science': ['Physics','Chemistry','Mathematics','Biology','Computer Science','English'],
+  'Grade 11 Commerce': ['Accountancy','Business Studies','Economics','Mathematics','English'],
+  'Grade 11 Arts': ['History','Geography','Political Science','Economics','Sociology','English'],
+  'Grade 12 Science': ['Physics','Chemistry','Mathematics','Biology','Computer Science','English'],
+  'Grade 12 Commerce': ['Accountancy','Business Studies','Economics','Mathematics','English'],
+  'Grade 12 Arts': ['History','Geography','Political Science','Economics','Sociology','English'],
+};
+const NLP_EXPLANATION_TYPES = [
+  { id: 'Explanation', label: 'Explanation', emoji: '💡', desc: 'Clear concept breakdown' },
+  { id: 'Story', label: 'Story', emoji: '📖', desc: 'Learn through a narrative story' },
+  { id: 'Worksheet', label: 'Worksheet', emoji: '📝', desc: 'Practice with exercises' },
+  { id: 'Analogy', label: 'Analogy', emoji: '🔗', desc: 'Real-life comparisons' },
+  { id: 'Q&A', label: 'Q&A', emoji: '❓', desc: 'Questions & answers' },
+  { id: 'Summary', label: 'Summary', emoji: '📋', desc: 'Quick concise overview' },
+];
+const NLP_LANGUAGES = ['English','Hindi','Bengali','Telugu','Marathi','Tamil','Gujarati','Kannada','Malayalam','Punjabi'];
+
 function NewLessonPanel() {
   const [grade, setGrade] = useState('Grade 8');
+  const [stream, setStream] = useState('Science');
   const [subject, setSubject] = useState('Mathematics');
   const [topic, setTopic] = useState('');
   const [type, setType] = useState('Explanation');
   const [language, setLanguage] = useState('English');
-  const [stream, setStream] = useState('');
   const [lessonContent, setLessonContent] = useState('');
   const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'sonar-pro', false);
 
-  const grades = ['Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12'];
-  const subjects = ['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology'];
-  const types = ['Explanation', 'Story', 'Analogy', 'Q&A', 'Summary', 'Worksheet'];
-  const languages = ['English', 'Hindi', 'Spanish', 'French', 'German'];
-  const streams = ['Science', 'Commerce', 'Arts', 'General'];
+  const hasStream = NLP_STREAMS[grade] !== undefined;
+  const subjectKey = hasStream ? `${grade} ${stream}` : grade;
+  const subjects = NLP_SUBJECTS_MAP[subjectKey] ?? NLP_SUBJECTS_MAP['Grade 8'];
 
-  const showStream = grade === 'Grade 11' || grade === 'Grade 12';
+  useEffect(() => {
+    if (!subjects.includes(subject)) setSubject(subjects[0]);
+  }, [grade, stream]);
 
   useEffect(() => {
     if (response) setLessonContent(response);
   }, [response]);
 
+  const selectedType = NLP_EXPLANATION_TYPES.find(t => t.id === type);
+
   const generate = () => {
     if (!topic.trim()) return;
     setLessonContent('');
-    const streamInfo = showStream && stream ? ` (${stream} stream)` : '';
+    const streamInfo = hasStream ? ` (${stream} stream)` : '';
     sendMessage([
-      { role: 'system', content: `You are an expert teacher creating lesson content. Write in ${language}. Be clear, engaging, and age-appropriate.` },
+      { role: 'system', content: `You are an expert teacher creating lesson content for Indian school curriculum (CBSE/ICSE). Write in ${language}. Be clear, engaging, and age-appropriate for ${grade} students.` },
       { role: 'user', content: `Create a ${type} lesson for ${grade}${streamInfo} students on the topic "${topic}" in ${subject}. Make it engaging and educational.` },
     ]);
   };
@@ -677,65 +712,91 @@ function NewLessonPanel() {
         <p className="text-sm text-gray-500">Generate a custom lesson with AI for any grade, subject, and style</p>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 space-y-4">
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1.5">Grade / Class</label>
-            <select value={grade} onChange={e => setGrade(e.target.value)} className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-              {grades.map(g => <option key={g}>{g}</option>)}
-            </select>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
+        {/* Left column */}
+        <div className="space-y-4">
+          {/* Grade */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+            <h3 className="font-semibold text-sm text-gray-900 mb-3">Class / Grade</h3>
+            <div className="flex flex-wrap gap-2">
+              {NLP_GRADES.map(g => (
+                <button key={g} onClick={() => setGrade(g)}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold border transition-all ${grade === g ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 text-gray-500 hover:border-indigo-300 hover:text-gray-900'}`}>
+                  {g.replace('Grade ', '')}
+                </button>
+              ))}
+            </div>
           </div>
-          {showStream && (
-            <div>
-              <label className="text-xs font-semibold text-gray-500 block mb-1.5">Stream</label>
-              <select value={stream} onChange={e => setStream(e.target.value)} className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                <option value="">Select stream</option>
-                {streams.map(s => <option key={s}>{s}</option>)}
-              </select>
+
+          {/* Stream (11-12 only) */}
+          {hasStream && (
+            <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+              <h3 className="font-semibold text-sm text-gray-900 mb-3">Stream / Course</h3>
+              <div className="flex gap-2">
+                {NLP_STREAMS[grade].map(s => (
+                  <button key={s} onClick={() => setStream(s)}
+                    className={`flex-1 py-2 rounded-xl text-xs font-semibold border transition-all ${stream === s ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 text-gray-500 hover:border-indigo-300'}`}>
+                    {s}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
-          <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1.5">Subject</label>
-            <select value={subject} onChange={e => setSubject(e.target.value)} className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+
+          {/* Subject */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+            <h3 className="font-semibold text-sm text-gray-900 mb-3">Subject</h3>
+            <select value={subject} onChange={e => setSubject(e.target.value)}
+              className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
               {subjects.map(s => <option key={s}>{s}</option>)}
             </select>
           </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1.5">Explanation Type</label>
-            <select value={type} onChange={e => setType(e.target.value)} className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-              {types.map(t => <option key={t}>{t}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="text-xs font-semibold text-gray-500 block mb-1.5">Language</label>
-            <select value={language} onChange={e => setLanguage(e.target.value)} className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-              {languages.map(l => <option key={l}>{l}</option>)}
+
+          {/* Language */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+            <h3 className="font-semibold text-sm text-gray-900 mb-3">Language</h3>
+            <select value={language} onChange={e => setLanguage(e.target.value)}
+              className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
+              {NLP_LANGUAGES.map(l => <option key={l}>{l}</option>)}
             </select>
           </div>
         </div>
-        <div>
-          <label className="text-xs font-semibold text-gray-500 block mb-1.5">Topic *</label>
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={topic}
-              onChange={e => setTopic(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && generate()}
+
+        {/* Right column */}
+        <div className="space-y-4">
+          {/* Explanation Type */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+            <h3 className="font-semibold text-sm text-gray-900 mb-3">Type of Explanation</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {NLP_EXPLANATION_TYPES.map(t => (
+                <button key={t.id} onClick={() => setType(t.id)}
+                  className={`flex flex-col items-start gap-1 p-2.5 md:p-3 rounded-xl border-2 transition-all text-left ${type === t.id ? 'border-indigo-600 bg-indigo-50' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'}`}>
+                  <span className="text-base md:text-lg">{t.emoji}</span>
+                  <span className={`text-xs font-bold ${type === t.id ? 'text-indigo-600' : 'text-gray-900'}`}>{t.label}</span>
+                  <span className="text-xs text-gray-500 leading-tight hidden sm:block">{t.desc}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Topic */}
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5">
+            <h3 className="font-semibold text-sm text-gray-900 mb-1">Topic / Chapter</h3>
+            <p className="text-xs text-gray-500 mb-3">Enter the topic you want to teach</p>
+            <textarea value={topic} onChange={e => setTopic(e.target.value)} rows={3}
               placeholder="e.g. Quadratic Equations, Photosynthesis, World War II…"
-              className="flex-1 text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-            />
-            <button
-              onClick={generate}
-              disabled={!topic.trim() || isLoading}
-              className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
-            >
-              {isLoading ? 'Generating…' : 'Generate Lesson'}
+              className="w-full text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none mb-3" />
+            <button onClick={generate} disabled={!topic.trim() || isLoading}
+              className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50">
+              {isLoading
+                ? <><svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>Generating {selectedType?.label}…</>
+                : <><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Generate {selectedType?.label}</>}
             </button>
           </div>
         </div>
       </div>
 
-      {isLoading && (
+      {isLoading && !lessonContent && (
         <div className="flex items-center justify-center py-12 gap-3 text-indigo-600">
           <svg className="animate-spin w-5 h-5" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
           <span className="text-sm font-medium">Generating your lesson…</span>
@@ -745,12 +806,20 @@ function NewLessonPanel() {
       {lessonContent && !isLoading && (
         <div className="bg-white border border-gray-200 rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <div>
-              <p className="text-xs font-bold text-indigo-600 uppercase tracking-wider">{type} · {subject} · {grade}</p>
-              <p className="text-lg font-extrabold text-gray-900 mt-0.5">{topic}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">{selectedType?.emoji}</span>
+              <div>
+                <h3 className="font-bold text-gray-900 text-sm">{selectedType?.label}: {topic}</h3>
+                <p className="text-xs text-gray-500">{grade}{hasStream ? ` · ${stream}` : ''} · {subject} · {language}</p>
+              </div>
             </div>
+            <button onClick={generate} disabled={isLoading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-50 transition-colors">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              Regenerate
+            </button>
           </div>
-          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap">{lessonContent}</div>
+          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-wrap border-t border-gray-100 pt-4">{lessonContent}</div>
         </div>
       )}
     </div>
