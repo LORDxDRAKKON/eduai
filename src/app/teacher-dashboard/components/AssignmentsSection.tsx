@@ -26,7 +26,13 @@ interface Assignment {
   createdAt: string;
 }
 
-const STUDENT_GROUPS = ['Grade 8 - Section A', 'Grade 8 - Section B', 'Grade 7 - Section A', 'Advanced Math Group', 'All Students'];
+const STUDENT_GROUPS = [
+  'Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5',
+  'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10',
+  'Grade 11 - Science', 'Grade 11 - Commerce', 'Grade 11 - Arts',
+  'Grade 12 - Science', 'Grade 12 - Commerce', 'Grade 12 - Arts',
+  'All Students',
+];
 
 const MOCK_ASSIGNMENTS: Assignment[] = [
   {
