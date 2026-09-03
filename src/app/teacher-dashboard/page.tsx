@@ -5,9 +5,15 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/lib/supabase/client';
-import { useChat } from '@/lib/hooks/useChat';
 import AssignmentsSection from './components/AssignmentsSection';
 import StudentsSection from './components/StudentsSection';
+import {
+  generateLesson,
+  generateFlashcards,
+  generateChallenges,
+  generateCodeReview,
+  generateTutorResponse,
+} from '@/lib/ai/templateEngine';
 
 interface TeacherProfile {
   full_name: string;
@@ -34,20 +40,17 @@ const OFFLINE_QA: { q: string; a: string; category: string }[] = [
 
 function OfflineAnswerSystem() {
   const [query, setQuery] = useState('');
-  const [aiAnswer, setAiAnswer] = useState('');
+  const [answer, setAnswer] = useState('');
   const [offlineResults, setOfflineResults] = useState<typeof OFFLINE_QA>([]);
   const [activeCategory, setActiveCategory] = useState('All');
   const [hasSearched, setHasSearched] = useState(false);
-  const { response, isLoading, error, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
 
   const categories = ['All', ...Array.from(new Set(OFFLINE_QA.map(q => q.category)))];
-
   const filteredBank = activeCategory === 'All' ? OFFLINE_QA : OFFLINE_QA.filter(q => q.category === activeCategory);
 
   const handleSearch = () => {
     if (!query.trim()) return;
     setHasSearched(true);
-    setAiAnswer('');
 
     // Offline fuzzy match
     const lower = query.toLowerCase();
@@ -59,22 +62,16 @@ function OfflineAnswerSystem() {
     );
     setOfflineResults(matched);
 
-    // Also ask AI
-    sendMessage([
-      { role: 'system', content: 'You are a helpful teacher assistant. Answer questions clearly and concisely for educational purposes. Keep answers under 150 words.' },
-      { role: 'user', content: query },
-    ]);
+    // Rule-based answer
+    const generated = generateTutorResponse(query);
+    setAnswer(generated);
   };
-
-  useEffect(() => {
-    if (response) setAiAnswer(response);
-  }, [response]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
         <h2 className="text-xl font-extrabold text-gray-900 mb-1">Offline Answer System</h2>
-        <p className="text-sm text-gray-500">Instant answers from the built-in knowledge bank + AI-powered answers when online</p>
+        <p className="text-sm text-gray-500">Instant answers from the built-in knowledge bank</p>
       </div>
 
       {/* Search */}
@@ -101,32 +98,25 @@ function OfflineAnswerSystem() {
       {/* Results */}
       {hasSearched && (
         <div className="space-y-4">
-          {/* AI Answer */}
+          {/* Smart Answer */}
           <div className="bg-indigo-50 border border-indigo-100 rounded-2xl p-5">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-6 h-6 bg-indigo-600 rounded-full flex items-center justify-center">
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><path d="M13 2L4.5 13.5H11L10 22L19.5 10.5H13L13 2Z" /></svg>
               </span>
-              <p className="text-xs font-bold text-indigo-700 uppercase tracking-wider">AI Answer (Perplexity)</p>
+              <p className="text-xs font-bold text-indigo-700 uppercase tracking-wider">Smart Answer</p>
             </div>
-            {isLoading ? (
-              <div className="flex items-center gap-2 text-sm text-indigo-600">
-                <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                Thinking…
-              </div>
-            ) : error ? (
-              <p className="text-sm text-red-500">AI unavailable — see offline answers below.</p>
-            ) : aiAnswer ? (
-              <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{aiAnswer}</p>
+            {answer ? (
+              <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">{answer}</p>
             ) : (
-              <p className="text-sm text-gray-400 italic">No AI response yet.</p>
+              <p className="text-sm text-gray-400 italic">No answer generated.</p>
             )}
           </div>
 
           {/* Offline matches */}
           {offlineResults.length > 0 && (
             <div>
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Offline Knowledge Bank ({offlineResults.length} match{offlineResults.length !== 1 ? 'es' : ''})</p>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Knowledge Bank ({offlineResults.length} match{offlineResults.length !== 1 ? 'es' : ''})</p>
               <div className="space-y-3">
                 {offlineResults.map((item, i) => (
                   <div key={i} className="bg-white border border-gray-200 rounded-2xl p-4">
@@ -143,9 +133,9 @@ function OfflineAnswerSystem() {
             </div>
           )}
 
-          {offlineResults.length === 0 && !isLoading && (
+          {offlineResults.length === 0 && (
             <div className="bg-white border border-gray-200 rounded-2xl p-6 text-center">
-              <p className="text-sm text-gray-500">No offline matches found. Check the AI answer above or browse the knowledge bank below.</p>
+              <p className="text-sm text-gray-500">No direct matches found. Check the smart answer above or browse the knowledge bank below.</p>
             </div>
           )}
         </div>
@@ -189,25 +179,8 @@ function OfflineAnswerSystem() {
 function AiTutorPanel() {
   const [messages, setMessages] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', true);
-  const [pendingResponse, setPendingResponse] = useState('');
-
-  useEffect(() => {
-    if (response) setPendingResponse(response);
-  }, [response]);
-
-  useEffect(() => {
-    if (!isLoading && pendingResponse) {
-      setMessages(prev => {
-        const last = prev[prev.length - 1];
-        if (last?.role === 'assistant') {
-          return [...prev.slice(0, -1), { role: 'assistant', content: pendingResponse }];
-        }
-        return [...prev, { role: 'assistant', content: pendingResponse }];
-      });
-    }
-  }, [isLoading]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -217,13 +190,15 @@ function AiTutorPanel() {
     if (!input.trim() || isLoading) return;
     const userMsg = { role: 'user' as const, content: input.trim() };
     setMessages(prev => [...prev, userMsg]);
-    setPendingResponse('');
     setInput('');
-    const history = [...messages, userMsg].map(m => ({ role: m.role, content: m.content }));
-    sendMessage([
-      { role: 'system', content: 'You are an expert AI tutor helping teachers and students. Be clear, concise, and educational.' },
-      ...history,
-    ]);
+    setIsLoading(true);
+
+    // Simulate a brief processing delay for UX
+    setTimeout(() => {
+      const responseText = generateTutorResponse(userMsg.content);
+      setMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
+      setIsLoading(false);
+    }, 400);
   };
 
   return (
@@ -252,7 +227,7 @@ function AiTutorPanel() {
           <div className="flex justify-start">
             <div className="bg-gray-100 rounded-2xl px-4 py-3 text-sm text-gray-500 flex items-center gap-2">
               <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-              {pendingResponse || 'Thinking…'}
+              Thinking…
             </div>
           </div>
         )}
@@ -284,25 +259,23 @@ function CodePlaygroundPanel() {
   const [code, setCode] = useState('// Write your code here\nfunction greet(name) {\n  return `Hello, ${name}!`;\n}\n\nconsole.log(greet("World"));');
   const [language, setLanguage] = useState('JavaScript');
   const [review, setReview] = useState('');
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
-
-  useEffect(() => {
-    if (response) setReview(response);
-  }, [response]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const reviewCode = () => {
     setReview('');
-    sendMessage([
-      { role: 'system', content: 'You are a code reviewer. Review the code for correctness, best practices, and suggest improvements. Be concise.' },
-      { role: 'user', content: `Review this ${language} code:\n\`\`\`${language.toLowerCase()}\n${code}\n\`\`\`` },
-    ]);
+    setIsLoading(true);
+    setTimeout(() => {
+      const result = generateCodeReview(language, code);
+      setReview(result);
+      setIsLoading(false);
+    }, 500);
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-5">
       <div>
         <h2 className="text-xl font-extrabold text-gray-900 mb-1">Code Playground</h2>
-        <p className="text-sm text-gray-500">Write code and get AI-powered code review</p>
+        <p className="text-sm text-gray-500">Write code and get instant code review</p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="space-y-3">
@@ -319,7 +292,7 @@ function CodePlaygroundPanel() {
               disabled={isLoading || !code.trim()}
               className="px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
             >
-              {isLoading ? 'Reviewing…' : 'AI Review'}
+              {isLoading ? 'Reviewing…' : 'Review Code'}
             </button>
           </div>
           <textarea
@@ -331,7 +304,7 @@ function CodePlaygroundPanel() {
           />
         </div>
         <div className="bg-white border border-gray-200 rounded-2xl p-5">
-          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">AI Code Review</p>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Code Review</p>
           {isLoading ? (
             <div className="flex items-center gap-2 text-sm text-indigo-600">
               <svg className="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
@@ -342,7 +315,7 @@ function CodePlaygroundPanel() {
           ) : (
             <div className="flex flex-col items-center justify-center h-40 text-center gap-2">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6" /><polyline points="8 6 2 12 8 18" /></svg>
-              <p className="text-sm text-gray-400">Click "AI Review" to get feedback on your code</p>
+              <p className="text-sm text-gray-400">Click "Review Code" to get feedback on your code</p>
             </div>
           )}
         </div>
@@ -359,33 +332,18 @@ function FlashcardsPanel() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [generating, setGenerating] = useState(false);
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
-
-  useEffect(() => {
-    if (response && !isLoading) {
-      try {
-        const jsonMatch = response.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          setCards(parsed);
-          setCurrentIdx(0);
-          setFlipped(false);
-        }
-      } catch {
-        // ignore parse errors
-      }
-      setGenerating(false);
-    }
-  }, [response, isLoading]);
 
   const generate = () => {
     if (!topic.trim()) return;
     setGenerating(true);
     setCards([]);
-    sendMessage([
-      { role: 'system', content: 'You are an educational flashcard generator. Return ONLY a valid JSON array with no extra text. Each object must have "front" (question), "back" (answer), and "example" (example question or use case) fields.' },
-      { role: 'user', content: `Generate 6 flashcards for the topic "${topic}" in ${subject}. Return ONLY a JSON array like: [{"front":"Q","back":"A","example":"Example question"}]` },
-    ]);
+    setTimeout(() => {
+      const generated = generateFlashcards(subject, topic);
+      setCards(generated);
+      setCurrentIdx(0);
+      setFlipped(false);
+      setGenerating(false);
+    }, 400);
   };
 
   const card = cards[currentIdx];
@@ -394,7 +352,7 @@ function FlashcardsPanel() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h2 className="text-xl font-extrabold text-gray-900 mb-1">Flashcards</h2>
-        <p className="text-sm text-gray-500">Generate AI-powered flashcards for any topic</p>
+        <p className="text-sm text-gray-500">Generate flashcards for any topic instantly</p>
       </div>
       <div className="bg-white border border-gray-200 rounded-2xl p-5 flex gap-3 flex-wrap">
         <select
@@ -414,7 +372,7 @@ function FlashcardsPanel() {
         />
         <button
           onClick={generate}
-          disabled={!topic.trim() || isLoading || generating}
+          disabled={!topic.trim() || generating}
           className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
         >
           {generating ? 'Generating…' : 'Generate'}
@@ -490,34 +448,19 @@ function DailyChallengesPanel() {
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [generating, setGenerating] = useState(false);
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
-
-  useEffect(() => {
-    if (response && !isLoading) {
-      try {
-        const jsonMatch = response.match(/\[[\s\S]*\]/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          setChallenges(parsed);
-          setCurrentIdx(0);
-          setSelected(null);
-          setRevealed(false);
-          setScore(0);
-        }
-      } catch {
-        // ignore
-      }
-      setGenerating(false);
-    }
-  }, [response, isLoading]);
 
   const generate = () => {
     setGenerating(true);
     setChallenges([]);
-    sendMessage([
-      { role: 'system', content: 'You are a quiz generator. Return ONLY a valid JSON array with no extra text.' },
-      { role: 'user', content: `Generate 5 ${difficulty} multiple-choice questions for ${subject}. Return ONLY a JSON array: [{"question":"Q","options":["A","B","C","D"],"answer":"A","explanation":"Why A is correct"}]` },
-    ]);
+    setTimeout(() => {
+      const generated = generateChallenges(subject, difficulty);
+      setChallenges(generated);
+      setCurrentIdx(0);
+      setSelected(null);
+      setRevealed(false);
+      setScore(0);
+      setGenerating(false);
+    }, 400);
   };
 
   const challenge = challenges[currentIdx];
@@ -540,7 +483,7 @@ function DailyChallengesPanel() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h2 className="text-xl font-extrabold text-gray-900 mb-1">Daily Challenges</h2>
-        <p className="text-sm text-gray-500">Test your knowledge with AI-generated quiz challenges</p>
+        <p className="text-sm text-gray-500">Test your knowledge with quiz challenges</p>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-2xl p-5 flex gap-3 flex-wrap items-end">
@@ -558,7 +501,7 @@ function DailyChallengesPanel() {
         </div>
         <button
           onClick={generate}
-          disabled={isLoading || generating}
+          disabled={generating}
           className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
         >
           {generating ? 'Generating…' : 'Start Challenge'}
@@ -679,7 +622,7 @@ function NewLessonPanel() {
   const [type, setType] = useState('Explanation');
   const [language, setLanguage] = useState('English');
   const [lessonContent, setLessonContent] = useState('');
-  const { response, isLoading, sendMessage } = useChat('PERPLEXITY', 'perplexity/sonar-pro', false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const hasStream = NLP_STREAMS[grade] !== undefined;
   const subjectKey = hasStream ? `${grade} ${stream}` : grade;
@@ -689,27 +632,24 @@ function NewLessonPanel() {
     if (!subjects.includes(subject)) setSubject(subjects[0]);
   }, [grade, stream]);
 
-  useEffect(() => {
-    if (response) setLessonContent(response);
-  }, [response]);
-
   const selectedType = NLP_EXPLANATION_TYPES.find(t => t.id === type);
 
   const generate = () => {
     if (!topic.trim()) return;
     setLessonContent('');
-    const streamInfo = hasStream ? ` (${stream} stream)` : '';
-    sendMessage([
-      { role: 'system', content: `You are an expert teacher creating lesson content for Indian school curriculum (CBSE/ICSE). Write in ${language}. Be clear, engaging, and age-appropriate for ${grade} students.` },
-      { role: 'user', content: `Create a ${type} lesson for ${grade}${streamInfo} students on the topic "${topic}" in ${subject}. Make it engaging and educational.` },
-    ]);
+    setIsLoading(true);
+    setTimeout(() => {
+      const content = generateLesson(grade, subject, topic, type, language);
+      setLessonContent(content);
+      setIsLoading(false);
+    }, 500);
   };
 
   return (
     <div className="max-w-4xl mx-auto space-y-5">
       <div>
         <h2 className="text-xl font-extrabold text-gray-900 mb-1">New Lesson</h2>
-        <p className="text-sm text-gray-500">Generate a custom lesson with AI for any grade, subject, and style</p>
+        <p className="text-sm text-gray-500">Generate a custom lesson for any grade, subject, and style</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-5">
@@ -953,7 +893,7 @@ export default function TeacherDashboardPage() {
               </svg>
             </div>
             <h1 className="text-2xl md:text-4xl font-extrabold text-gray-900 mb-1 md:mb-2">{greeting}, {teacherName}!</h1>
-            <p className="text-gray-500 text-sm md:text-base">Create lessons, manage students, and teach with AI.</p>
+            <p className="text-gray-500 text-sm md:text-base">Create lessons, manage students, and teach smarter.</p>
           </div>
 
           {/* Quick Stats */}
@@ -1136,7 +1076,6 @@ export default function TeacherDashboardPage() {
         {/* Topbar */}
         <header className="h-14 md:h-16 bg-white border-b border-gray-200 flex items-center justify-between px-3 md:px-6 gap-2 flex-shrink-0">
           <div className="flex items-center gap-2 min-w-0">
-            {/* Hamburger for mobile/tablet */}
             <button
               onClick={() => setSidebarOpen(true)}
               className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition flex-shrink-0"
@@ -1146,7 +1085,6 @@ export default function TeacherDashboardPage() {
                 <line x1="4" x2="20" y1="12" y2="12" /><line x1="4" x2="20" y1="6" y2="6" /><line x1="4" x2="20" y1="18" y2="18" />
               </svg>
             </button>
-            {/* Breadcrumb */}
             <div className="flex items-center gap-1.5 text-sm text-gray-500 min-w-0">
               <button onClick={() => setActiveView('dashboard')} className="hover:text-gray-900 transition-colors font-medium hidden sm:block flex-shrink-0">Dashboard</button>
               {activeView !== 'dashboard' && (
@@ -1162,7 +1100,6 @@ export default function TeacherDashboardPage() {
           </div>
 
           <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
-            {/* Admin Panel Button */}
             <Link
               href="/teacher-admin"
               className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full border border-gray-200 text-xs md:text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
@@ -1174,19 +1111,16 @@ export default function TeacherDashboardPage() {
               <span className="md:hidden">Admin</span>
             </Link>
 
-            {/* Notification Bell */}
             <button className="relative p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
             </button>
 
-            {/* Avatar */}
             <div className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-indigo-600 flex items-center justify-center text-white text-sm font-bold flex-shrink-0">
               {teacherInitial}
             </div>
 
-            {/* Logout */}
             <button
               onClick={handleSignOut}
               className="hidden sm:flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 font-medium transition-colors"
@@ -1196,7 +1130,6 @@ export default function TeacherDashboardPage() {
               </svg>
               Logout
             </button>
-            {/* Mobile logout icon only */}
             <button
               onClick={handleSignOut}
               className="sm:hidden p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-500"
