@@ -39,6 +39,11 @@ export default function DashboardPage() {
   const [activeView, setActiveView] = useState<ActiveView>('dashboard');
   const { userRole, loading: authLoading, user } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -140,7 +145,15 @@ export default function DashboardPage() {
 
 function DashboardView({ onActionClick }: { onActionClick: (type: string) => void }) {
   const { user } = useAuth();
-  const studentName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Alex';
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const studentName = mounted
+    ? (user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Alex')
+    : 'Alex';
 
   const stats = {
     streak: 0,
