@@ -328,24 +328,37 @@ function AiTutorView({ onBack }: { onBack: () => void }) {
     }, 400);
   };
 
-  const suggested = ["Explain Newton\'s laws of motion", "How does photosynthesis work?", "Solve: 2x² + 5x - 3 = 0", "What caused World War I?"];
+  const suggested = [
+    { text: "Explain Newton\'s Laws of Motion simply 🚀", emoji: "🚀" },
+    { text: "Help me practice English conversation 💬", emoji: "💬" },
+    { text: "Teach me basic Python programming 🐍", emoji: "🐍" },
+    { text: "What are the causes of World War I? 🌍", emoji: "🌍" },
+    { text: "Solve: If a train travels 120km in 2 hours... 🚂", emoji: "🚂" },
+    { text: "Tips for improving my handwriting ✍️", emoji: "✍️" },
+  ];
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-gray-50">
       <ViewHeader onBack={onBack} icon={<BotIcon />} title="AI Tutor" subtitle="Ask me anything about your studies" />
       <div className="flex-1 overflow-y-auto p-3 md:p-6 space-y-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-4 md:gap-6 text-center px-2">
-            <div className="h-14 w-14 md:h-16 md:w-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-              <BotIcon className="w-6 h-6 md:w-7 md:h-7 text-primary" />
+          <div className="flex flex-col items-center justify-center min-h-full gap-5 text-center px-4 py-8">
+            <div className="w-20 h-20 rounded-3xl bg-blue-100 flex items-center justify-center shadow-sm">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/>
+                <path d="M5 5l1.5 1.5M19 5l-1.5 1.5M5 19l1.5-1.5M19 19l-1.5-1.5"/>
+              </svg>
             </div>
             <div>
-              <h3 className="font-bold text-foreground text-base md:text-lg mb-1">Hi! I'm your AI Tutor</h3>
-              <p className="text-muted-foreground text-sm max-w-sm">Ask me any question about your studies — I'll explain concepts, solve problems, and help you learn!</p>
+              <h3 className="font-bold text-gray-900 text-xl mb-2">Hello! I'm your AI Tutor 👋</h3>
+              <p className="text-gray-500 text-sm max-w-md leading-relaxed">I can help you understand concepts, solve problems, practice communication, and learn coding. Try one of these:</p>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
-              {suggested.map(q => (
-                <button key={q} onClick={() => setInput(q)} className="text-left px-3 py-2.5 md:px-4 md:py-3 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition text-sm text-foreground">{q}</button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
+              {suggested.map(s => (
+                <button key={s.text} onClick={() => setInput(s.text)}
+                  className="text-left px-4 py-4 rounded-2xl border border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm transition-all text-sm text-indigo-600 font-medium shadow-sm">
+                  {s.text}
+                </button>
               ))}
             </div>
           </div>
@@ -353,7 +366,7 @@ function AiTutorView({ onBack }: { onBack: () => void }) {
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mr-2 mt-1 shrink-0"><BotIcon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /></div>}
-            <div className={`max-w-[85%] md:max-w-[75%] px-3 py-2.5 md:px-4 md:py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-primary text-white rounded-br-sm' : 'bg-card border border-border text-foreground rounded-bl-sm'}`}>
+            <div className={`max-w-[85%] md:max-w-[75%] px-3 py-2.5 md:px-4 md:py-3 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${msg.role === 'user' ? 'bg-primary text-white rounded-br-sm' : 'bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm'}`}>
               {msg.content}
             </div>
           </div>
@@ -361,27 +374,27 @@ function AiTutorView({ onBack }: { onBack: () => void }) {
         {isLoading && (
           <div className="flex justify-start">
             <div className="h-7 w-7 md:h-8 md:w-8 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center mr-2 mt-1 shrink-0"><BotIcon className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" /></div>
-            <div className="bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3">
+            <div className="bg-white border border-gray-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
               <div className="flex gap-1">
-                {[0,150,300].map(d => <span key={d} className="w-2 h-2 rounded-full bg-muted-foreground/40 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
+                {[0,150,300].map(d => <span key={d} className="w-2 h-2 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: `${d}ms` }} />)}
               </div>
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="p-3 md:p-4 border-t border-border bg-card shrink-0">
+      <div className="p-3 md:p-4 border-t border-gray-200 bg-white shrink-0">
         <div className="flex items-end gap-2 md:gap-3 max-w-3xl mx-auto">
           <textarea value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
             placeholder="Ask your tutor anything..." rows={1}
-            className="flex-1 px-3 py-2.5 md:px-4 md:py-3 rounded-xl border border-border bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary text-sm resize-none"
+            className="flex-1 px-3 py-2.5 md:px-4 md:py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 text-sm resize-none"
             style={{ minHeight: '44px', maxHeight: '120px' }} />
           <button onClick={handleSend} disabled={!input.trim() || isLoading}
-            className="h-11 w-11 md:h-12 md:w-12 rounded-xl bg-primary text-white flex items-center justify-center hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition shrink-0 active:scale-95">
+            className="h-11 w-11 md:h-12 md:w-12 rounded-xl bg-indigo-600 text-white flex items-center justify-center hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition shrink-0 active:scale-95">
             {isLoading ? <SpinIcon className="h-4 w-4" /> : <SendIcon />}
           </button>
         </div>
-        <p className="text-center text-xs text-muted-foreground mt-2 hidden sm:block">Powered by built-in knowledge engine · Press Enter to send</p>
+        <p className="text-center text-xs text-gray-400 mt-2 hidden sm:block">Powered by built-in knowledge engine · Press Enter to send</p>
       </div>
     </div>
   );
@@ -677,44 +690,66 @@ function FlashcardsView({ onBack }: { onBack: () => void }) {
 
   const current = cards[currentIdx];
 
-  return (
-    <div className="flex flex-col h-full">
-      <ViewHeader onBack={onBack} icon={<LayersIcon />} title="Flashcards" subtitle="Study with spaced repetition" />
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-2xl mx-auto mb-8">
-          <div className="bg-card rounded-2xl border border-border p-5">
-            <h3 className="font-semibold text-sm text-foreground mb-4">Generate Flashcards</h3>
-            <div className="flex gap-3 mb-3">
-              <input value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleGenerate(); }}
-                placeholder="Enter topic (e.g., Photosynthesis, Algebra...)"
-                className="flex-1 px-4 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
-              <select value={subject} onChange={e => setSubject(e.target.value)}
-                className="px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none">
-                {['Mathematics','Science','History','Geography','English','Physics','Chemistry','Biology'].map(s => <option key={s}>{s}</option>)}
-              </select>
-            </div>
-            <button onClick={handleGenerate} disabled={isLoading || !topic.trim()}
-              className="w-full flex items-center justify-center gap-2 py-2.5 bg-primary text-white text-sm font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition">
-              {isLoading ? <><SpinIcon />Generating...</> : <><SparkleIcon className="w-4 h-4" />Generate Flashcards</>}
-            </button>
-          </div>
-        </div>
+  const PRESET_TOPICS = [
+    'Photosynthesis', "Newton\'s Laws", 'Indian Independence', 'Human Body Systems',
+    'Algebra Basics', 'Solar System', 'Water Cycle', 'Chemical Reactions',
+    'Grammar Rules', 'Python Basics', 'Geometry', 'Indian Constitution',
+  ];
 
+  return (
+    <div className="flex flex-col h-full bg-gray-50">
+      <div className="flex items-center gap-3 px-4 md:px-6 py-4 bg-white border-b border-gray-200 shrink-0">
+        <button onClick={onBack} className="h-9 w-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </div>
+        <div>
+          <h2 className="font-extrabold text-gray-900 text-base leading-tight">Flashcards</h2>
+          <p className="text-xs text-gray-500">Pick a topic to study</p>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        {cards.length === 0 && (
+          <div className="max-w-4xl mx-auto">
+            <h3 className="font-bold text-gray-900 text-base mb-4">Choose a topic:</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              {PRESET_TOPICS.map(t => (
+                <button key={t} onClick={() => { setTopic(t); }}
+                  className={`px-4 py-4 rounded-2xl border-2 text-sm font-medium text-left transition-all ${topic === t ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:shadow-sm'}`}>
+                  {t}
+                </button>
+              ))}
+            </div>
+            <h3 className="font-bold text-gray-900 text-base mb-3">Or enter your own:</h3>
+            <div className="flex gap-3">
+              <input value={topic} onChange={e => setTopic(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') handleGenerate(); }}
+                placeholder="Type a topic..."
+                className="flex-1 px-4 py-3 rounded-2xl border border-gray-200 bg-white text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 shadow-sm" />
+              <button onClick={handleGenerate} disabled={isLoading || !topic.trim()}
+                className="px-6 py-3 bg-indigo-400 text-white text-sm font-semibold rounded-2xl hover:bg-indigo-500 disabled:opacity-50 transition shadow-sm">
+                {isLoading ? 'Generating...' : 'Generate'}
+              </button>
+            </div>
+          </div>
+        )}
         {cards.length > 0 && current && (
           <div className="max-w-2xl mx-auto">
-            <div className="text-center mb-4">
-              <span className="text-sm text-muted-foreground">{currentIdx + 1} / {cards.length}</span>
+            <div className="flex items-center justify-between mb-4">
+              <button onClick={() => { setCards([]); setTopic(''); }} className="text-xs text-indigo-600 font-medium hover:underline">← Back to topics</button>
+              <span className="text-sm text-gray-500">{currentIdx + 1} / {cards.length}</span>
             </div>
             <div onClick={() => setFlipped(!flipped)} className="cursor-pointer mb-4" style={{ perspective: '1000px' }}>
               <div className={`relative w-full transition-transform duration-500`} style={{ transformStyle: 'preserve-3d', transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)', minHeight: '220px' }}>
-                <div className="absolute inset-0 bg-card border-2 border-primary/30 rounded-2xl p-8 flex flex-col items-center justify-center text-center" style={{ backfaceVisibility: 'hidden' }}>
-                  <span className="text-xs font-bold text-primary uppercase tracking-wider mb-3">Question</span>
-                  <p className="text-lg font-semibold text-foreground">{current.front}</p>
-                  <p className="text-xs text-muted-foreground mt-4">Click to reveal answer</p>
+                <div className="absolute inset-0 bg-white border-2 border-indigo-200 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-sm" style={{ backfaceVisibility: 'hidden' }}>
+                  <span className="text-xs font-bold text-indigo-500 uppercase tracking-wider mb-3">Question</span>
+                  <p className="text-lg font-semibold text-gray-900">{current.front}</p>
+                  <p className="text-xs text-gray-400 mt-4">Click to reveal answer</p>
                 </div>
-                <div className="absolute inset-0 bg-primary/5 border-2 border-primary rounded-2xl p-6 flex flex-col items-center justify-center text-center" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                  <span className="text-xs font-bold text-primary uppercase tracking-wider mb-2">Answer</span>
-                  <p className="text-base text-foreground leading-relaxed mb-4">{current.back}</p>
+                <div className="absolute inset-0 bg-indigo-50 border-2 border-indigo-400 rounded-2xl p-6 flex flex-col items-center justify-center text-center shadow-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
+                  <span className="text-xs font-bold text-indigo-600 uppercase tracking-wider mb-2">Answer</span>
+                  <p className="text-base text-gray-800 leading-relaxed mb-4">{current.back}</p>
                   {current.exampleQuestion && (
                     <div className="w-full mt-2 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3">
                       <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">📝 Example Question</p>
@@ -725,22 +760,12 @@ function FlashcardsView({ onBack }: { onBack: () => void }) {
               </div>
             </div>
 
-            {current.exampleQuestion && (
-              <div className="max-w-2xl mx-auto mb-4 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-start gap-2">
-                <span className="text-base mt-0.5">📝</span>
-                <div>
-                  <p className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-0.5">Example Question</p>
-                  <p className="text-sm text-amber-900">{current.exampleQuestion}</p>
-                </div>
-              </div>
-            )}
-
             <div className="flex items-center justify-center gap-4">
               <button onClick={() => { setCurrentIdx(Math.max(0, currentIdx - 1)); setFlipped(false); }} disabled={currentIdx === 0}
-                className="px-5 py-2.5 rounded-xl border border-border text-sm font-medium text-foreground hover:bg-muted disabled:opacity-40 transition">← Prev</button>
-              <button onClick={() => setFlipped(!flipped)} className="px-5 py-2.5 rounded-xl bg-primary/10 text-primary text-sm font-medium hover:bg-primary/20 transition">Flip</button>
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition shadow-sm">← Prev</button>
+              <button onClick={() => setFlipped(!flipped)} className="px-5 py-2.5 rounded-xl bg-indigo-100 text-indigo-600 text-sm font-medium hover:bg-indigo-200 transition">Flip</button>
               <button onClick={() => { setCurrentIdx(Math.min(cards.length - 1, currentIdx + 1)); setFlipped(false); }} disabled={currentIdx === cards.length - 1}
-                className="px-5 py-2.5 rounded-xl border border-border text-sm font-medium text-foreground hover:bg-muted disabled:opacity-40 transition">Next →</button>
+                className="px-5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40 transition shadow-sm">Next →</button>
             </div>
           </div>
         )}
@@ -891,15 +916,16 @@ function DailyChallengesView({ onBack }: { onBack: () => void }) {
     try { setXp(parseInt(localStorage.getItem('eduai-xp') || '0')); } catch {}
   }, []);
 
-  const handleGetChallenge = () => {
+  const handleGetChallenge = (subjectOverride?: string) => {
+    const activeSubject = subjectOverride || subject;
     setChallenge(''); setFeedback(''); setAnswer(''); setCurrentChallenge(null);
     setIsLoadingChallenge(true);
     setTimeout(() => {
-      const challenges = generateChallenges(subject, difficulty);
+      const challenges = generateChallenges(activeSubject, difficulty);
       if (challenges.length > 0) {
         const c = challenges[0];
         setCurrentChallenge({ question: c.question, answer: c.answer, explanation: c.explanation });
-        setChallenge(`📋 Challenge (${difficulty})\n\n${c.question}\n\n💡 Hint: Think about the core concept of ${subject}.`);
+        setChallenge(`📋 Challenge (${difficulty})\n\n${c.question}\n\n💡 Hint: Think about the core concept of ${activeSubject}.`);
       }
       setIsLoadingChallenge(false);
     }, 500);
@@ -924,63 +950,105 @@ function DailyChallengesView({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div className="flex flex-col h-full">
-      <ViewHeader onBack={onBack} icon={<FlameIcon />} title="Daily Challenges" subtitle="Practice problems and earn XP" />
-      <div className="flex-1 overflow-y-auto p-6">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-card rounded-2xl border border-border p-4 mb-6 flex items-center gap-4">
-            <div className="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center text-2xl">🔥</div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-semibold text-sm text-foreground">Your XP</span>
-                <span className="font-bold text-primary">{xp} XP</span>
-              </div>
-              <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-orange-500 h-2 rounded-full transition-all" style={{ width: `${Math.min(100, (xp % 100))}%` }} />
-              </div>
+    <div className="flex flex-col h-full bg-gray-50">
+      <div className="flex items-center gap-3 px-4 md:px-6 py-4 bg-white border-b border-gray-200 shrink-0">
+        <button onClick={onBack} className="h-9 w-9 rounded-xl border border-gray-200 bg-white flex items-center justify-center hover:bg-gray-50 transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        </div>
+        <div>
+          <h2 className="font-extrabold text-gray-900 text-base leading-tight">Daily Challenges</h2>
+          <p className="text-xs text-gray-500">Practice makes perfect!</p>
+        </div>
+      </div>
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Stats Row */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+              <p className="text-2xl font-bold text-gray-900">0</p>
+              <p className="text-xs text-gray-500 mt-1">Day Streak</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <p className="text-2xl font-bold text-gray-900">{xp}</p>
+              <p className="text-xs text-gray-500 mt-1">Total XP</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+              <p className="text-2xl font-bold text-gray-900">0</p>
+              <p className="text-xs text-gray-500 mt-1">Today</p>
             </div>
           </div>
 
-          <div className="bg-card rounded-2xl border border-border p-5 mb-6">
-            <div className="flex gap-3 mb-4 flex-wrap">
-              <select value={grade} onChange={e => setGrade(e.target.value)}
-                className="flex-1 px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none">
-                {GRADES.map(g => <option key={g}>{g}</option>)}
-              </select>
-              <select value={subject} onChange={e => setSubject(e.target.value)}
-                className="flex-1 px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none">
-                {['Mathematics','Science','Physics','Chemistry','Biology','History','Geography','English'].map(s => <option key={s}>{s}</option>)}
-              </select>
-              <select value={difficulty} onChange={e => setDifficulty(e.target.value)}
-                className="flex-1 px-3 py-2.5 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none">
-                {['Easy','Medium','Hard'].map(d => <option key={d}>{d}</option>)}
-              </select>
+          {/* Difficulty Toggle */}
+          <div>
+            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">DIFFICULTY</p>
+            <div className="flex gap-2">
+              {['Easy', 'Medium', 'Hard'].map(d => (
+                <button key={d} onClick={() => setDifficulty(d)}
+                  className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${difficulty === d ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+                  {d}
+                </button>
+              ))}
             </div>
-            <button onClick={handleGetChallenge} disabled={isLoadingChallenge}
-              className="w-full flex items-center justify-center gap-2 py-3 bg-orange-500 text-white font-semibold rounded-xl hover:bg-orange-600 disabled:opacity-50 transition">
-              {isLoadingChallenge ? <><SpinIcon />Loading Challenge...</> : <>🎯 Get Today's Challenge</>}
-            </button>
           </div>
 
-          {challenge && (
-            <div className="bg-card rounded-2xl border border-border p-6 mb-4">
-              <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2"><span>📋</span> Challenge</h3>
-              <div className="text-sm text-foreground leading-relaxed whitespace-pre-wrap mb-5">{challenge}</div>
-              <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Your Answer</label>
-              <textarea value={answer} onChange={e => setAnswer(e.target.value)} rows={4}
-                placeholder="Write your solution here..."
-                className="w-full px-4 py-3 rounded-xl border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none mb-3" />
-              <button onClick={handleSubmit} disabled={isLoadingFeedback || !answer.trim()}
-                className="w-full flex items-center justify-center gap-2 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition">
-                {isLoadingFeedback ? <><SpinIcon />Checking...</> : <>✓ Submit Answer</>}
-              </button>
+          {/* Category Grid */}
+          {!currentChallenge && (
+            <div>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">PICK A CATEGORY</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {[
+                  { name: 'Math', icon: '🧮', color: 'bg-blue-100', iconColor: 'text-blue-600', subject: 'Mathematics' },
+                  { name: 'English', icon: '📖', color: 'bg-purple-100', iconColor: 'text-purple-600', subject: 'English' },
+                  { name: 'Logic', icon: '🧠', color: 'bg-orange-100', iconColor: 'text-orange-600', subject: 'Science' },
+                  { name: 'Coding', icon: '💻', color: 'bg-green-100', iconColor: 'text-green-600', subject: 'Science' },
+                  { name: 'Science', icon: '⚡', color: 'bg-yellow-100', iconColor: 'text-yellow-600', subject: 'Science' },
+                  { name: 'GK', icon: '🌐', color: 'bg-red-100', iconColor: 'text-red-500', subject: 'History' },
+                ].map(cat => (
+                  <button key={cat.name} onClick={() => { setSubject(cat.subject); handleGetChallenge(cat.subject); }}
+                    disabled={isLoadingChallenge}
+                    className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-start gap-3 hover:shadow-md hover:border-gray-300 transition-all disabled:opacity-50 shadow-sm">
+                    <div className={`w-12 h-12 rounded-full ${cat.color} flex items-center justify-center text-xl`}>
+                      {cat.icon}
+                    </div>
+                    <p className="font-bold text-gray-900 text-sm">{cat.name}</p>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 
-          {feedback && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5">
-              <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2"><span>✨</span> Feedback</h3>
-              <div className="text-sm text-emerald-900 leading-relaxed whitespace-pre-wrap">{feedback}</div>
+          {/* Challenge Card */}
+          {currentChallenge && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <button onClick={() => { setCurrentChallenge(null); setChallenge(''); setFeedback(''); setAnswer(''); }}
+                  className="text-xs text-indigo-600 font-medium hover:underline">← Back to categories</button>
+                <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${difficulty === 'Easy' ? 'bg-emerald-100 text-emerald-700' : difficulty === 'Hard' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{difficulty}</span>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2"><span>📋</span> Challenge</h3>
+                <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap mb-5">{challenge}</div>
+                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Your Answer</label>
+                <textarea value={answer} onChange={e => setAnswer(e.target.value)} rows={4}
+                  placeholder="Write your solution here..."
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 resize-none mb-3" />
+                <button onClick={handleSubmit} disabled={isLoadingFeedback || !answer.trim()}
+                  className="w-full flex items-center justify-center gap-2 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 disabled:opacity-50 transition">
+                  {isLoadingFeedback ? <><SpinIcon />Checking...</> : <>✓ Submit Answer</>}
+                </button>
+              </div>
+              {feedback && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 shadow-sm">
+                  <h3 className="font-semibold text-emerald-800 mb-3 flex items-center gap-2"><span>✨</span> Feedback</h3>
+                  <div className="text-sm text-emerald-900 leading-relaxed whitespace-pre-wrap">{feedback}</div>
+                </div>
+              )}
             </div>
           )}
         </div>

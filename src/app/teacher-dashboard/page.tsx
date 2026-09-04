@@ -186,14 +186,14 @@ function AiTutorPanel() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  const send = () => {
-    if (!input.trim() || isLoading) return;
-    const userMsg = { role: 'user' as const, content: input.trim() };
+  const send = (text?: string) => {
+    const msg = text || input;
+    if (!msg.trim() || isLoading) return;
+    const userMsg = { role: 'user' as const, content: msg.trim() };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsLoading(true);
 
-    // Simulate a brief processing delay for UX
     setTimeout(() => {
       const responseText = generateTutorResponse(userMsg.content);
       setMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
@@ -201,19 +201,38 @@ function AiTutorPanel() {
     }, 400);
   };
 
+  const suggestedPrompts = [
+    { text: "Explain Newton\'s Laws of Motion simply 🚀", emoji: "🚀" },
+    { text: "Help me practice English conversation 💬", emoji: "💬" },
+    { text: "Teach me basic Python programming 🐍", emoji: "🐍" },
+    { text: "What are the causes of World War I? 🌍", emoji: "🌍" },
+    { text: "Solve: If a train travels 120km in 2 hours... 🚂", emoji: "🚂" },
+    { text: "Tips for improving my handwriting ✍️", emoji: "✍️" },
+  ];
+
   return (
     <div className="max-w-3xl mx-auto flex flex-col h-[calc(100vh-180px)]">
-      <div className="mb-4">
-        <h2 className="text-xl font-extrabold text-gray-900 mb-1">AI Tutor</h2>
-        <p className="text-sm text-gray-500">Ask anything — get clear, educational explanations</p>
-      </div>
       <div className="flex-1 overflow-y-auto space-y-4 bg-white border border-gray-200 rounded-2xl p-5 mb-4">
         {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center gap-3">
-            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M8 10h8M8 14h5" /></svg>
+          <div className="flex flex-col items-center justify-center h-full text-center gap-5 py-8">
+            <div className="w-20 h-20 rounded-3xl bg-blue-100 flex items-center justify-center shadow-sm">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 2L9.5 9.5 2 12l7.5 2.5L12 22l2.5-7.5L22 12l-7.5-2.5z"/>
+                <path d="M5 5l1.5 1.5M19 5l-1.5 1.5M5 19l1.5-1.5M19 19l-1.5-1.5"/>
+              </svg>
             </div>
-            <p className="text-sm text-gray-500">Start a conversation with your AI Tutor</p>
+            <div>
+              <h3 className="font-bold text-gray-900 text-xl mb-2">Hello! I'm your AI Tutor 👋</h3>
+              <p className="text-gray-500 text-sm max-w-md leading-relaxed">I can help you understand concepts, solve problems, practice communication, and learn coding. Try one of these:</p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-2xl">
+              {suggestedPrompts.map(s => (
+                <button key={s.text} onClick={() => send(s.text)}
+                  className="text-left px-4 py-4 rounded-2xl border border-gray-200 bg-white hover:border-indigo-300 hover:shadow-sm transition-all text-sm text-indigo-600 font-medium shadow-sm">
+                  {s.text}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {messages.map((m, i) => (
@@ -243,7 +262,7 @@ function AiTutorPanel() {
           className="flex-1 text-sm bg-white border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300"
         />
         <button
-          onClick={send}
+          onClick={() => send()}
           disabled={!input.trim() || isLoading}
           className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
         >
@@ -333,12 +352,19 @@ function FlashcardsPanel() {
   const [flipped, setFlipped] = useState(false);
   const [generating, setGenerating] = useState(false);
 
-  const generate = () => {
-    if (!topic.trim()) return;
+  const PRESET_TOPICS = [
+    'Photosynthesis', "Newton\'s Laws", 'Indian Independence', 'Human Body Systems',
+    'Algebra Basics', 'Solar System', 'Water Cycle', 'Chemical Reactions',
+    'Grammar Rules', 'Python Basics', 'Geometry', 'Indian Constitution',
+  ];
+
+  const generate = (topicOverride?: string) => {
+    const t = topicOverride || topic;
+    if (!t.trim()) return;
     setGenerating(true);
     setCards([]);
     setTimeout(() => {
-      const generated = generateFlashcards(subject, topic);
+      const generated = generateFlashcards(subject, t);
       setCards(generated);
       setCurrentIdx(0);
       setFlipped(false);
@@ -349,35 +375,52 @@ function FlashcardsPanel() {
   const card = cards[currentIdx];
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h2 className="text-xl font-extrabold text-gray-900 mb-1">Flashcards</h2>
-        <p className="text-sm text-gray-500">Generate flashcards for any topic instantly</p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+        </div>
+        <div>
+          <h2 className="text-base font-extrabold text-gray-900 leading-tight">Flashcards</h2>
+          <p className="text-xs text-gray-500">Pick a topic to study</p>
+        </div>
       </div>
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 flex gap-3 flex-wrap">
-        <select
-          value={subject}
-          onChange={e => setSubject(e.target.value)}
-          className="text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        >
-          {['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology'].map(s => <option key={s}>{s}</option>)}
-        </select>
-        <input
-          type="text"
-          value={topic}
-          onChange={e => setTopic(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && generate()}
-          placeholder="Enter topic… e.g. Quadratic Equations"
-          className="flex-1 min-w-[180px] text-sm bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300"
-        />
-        <button
-          onClick={generate}
-          disabled={!topic.trim() || generating}
-          className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
-        >
-          {generating ? 'Generating…' : 'Generate'}
-        </button>
-      </div>
+
+      <div className="border-t border-gray-200 pt-5" />
+
+      {cards.length === 0 && (
+        <>
+          <div>
+            <h3 className="font-bold text-gray-900 text-base mb-4">Choose a topic:</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+              {PRESET_TOPICS.map(t => (
+                <button key={t} onClick={() => { setTopic(t); }}
+                  className={`px-4 py-4 rounded-2xl border-2 text-sm font-medium text-left transition-all ${topic === t ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:shadow-sm'}`}>
+                  {t}
+                </button>
+              ))}
+            </div>
+            <h3 className="font-bold text-gray-900 text-base mb-3">Or enter your own:</h3>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={topic}
+                onChange={e => setTopic(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && generate()}
+                placeholder="Type a topic..."
+                className="flex-1 text-sm bg-white border border-gray-200 rounded-2xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-300 shadow-sm"
+              />
+              <button
+                onClick={() => generate()}
+                disabled={!topic.trim() || generating}
+                className="px-6 py-3 bg-indigo-400 text-white text-sm font-semibold rounded-2xl hover:bg-indigo-500 transition-colors disabled:opacity-50 shadow-sm"
+              >
+                {generating ? 'Generating…' : 'Generate'}
+              </button>
+            </div>
+          </div>
+        </>
+      )}
 
       {generating && (
         <div className="flex items-center justify-center py-12 gap-3 text-indigo-600">
@@ -389,16 +432,19 @@ function FlashcardsPanel() {
       {cards.length > 0 && card && (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>Card {currentIdx + 1} of {cards.length}</span>
-            <div className="flex gap-2">
-              <button onClick={() => { setCurrentIdx(i => Math.max(0, i - 1)); setFlipped(false); }} disabled={currentIdx === 0} className="px-3 py-1.5 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-40">← Prev</button>
-              <button onClick={() => { setCurrentIdx(i => Math.min(cards.length - 1, i + 1)); setFlipped(false); }} disabled={currentIdx === cards.length - 1} className="px-3 py-1.5 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors disabled:opacity-40">Next →</button>
+            <button onClick={() => { setCards([]); setTopic(''); }} className="text-xs text-indigo-600 font-medium hover:underline">← Back to topics</button>
+            <div className="flex items-center gap-3">
+              <span>Card {currentIdx + 1} of {cards.length}</span>
+              <div className="flex gap-2">
+                <button onClick={() => { setCurrentIdx(i => Math.max(0, i - 1)); setFlipped(false); }} disabled={currentIdx === 0} className="px-3 py-1.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-40 shadow-sm">← Prev</button>
+                <button onClick={() => { setCurrentIdx(i => Math.min(cards.length - 1, i + 1)); setFlipped(false); }} disabled={currentIdx === cards.length - 1} className="px-3 py-1.5 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors disabled:opacity-40 shadow-sm">Next →</button>
+              </div>
             </div>
           </div>
 
           <button
             onClick={() => setFlipped(f => !f)}
-            className="w-full min-h-[200px] bg-white border-2 border-indigo-200 rounded-2xl p-8 text-center hover:border-indigo-400 transition-all cursor-pointer"
+            className="w-full min-h-[200px] bg-white border-2 border-indigo-200 rounded-2xl p-8 text-center hover:border-indigo-400 transition-all cursor-pointer shadow-sm"
           >
             {!flipped ? (
               <div>
@@ -420,18 +466,6 @@ function FlashcardsPanel() {
               <p className="text-sm text-amber-900">{card.example}</p>
             </div>
           )}
-
-          <div className="flex gap-2 flex-wrap">
-            {cards.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => { setCurrentIdx(i); setFlipped(false); }}
-                className={`w-8 h-8 rounded-full text-xs font-bold transition-colors ${i === currentIdx ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
-              >
-                {i + 1}
-              </button>
-            ))}
-          </div>
         </div>
       )}
     </div>
@@ -448,12 +482,15 @@ function DailyChallengesPanel() {
   const [revealed, setRevealed] = useState(false);
   const [score, setScore] = useState(0);
   const [generating, setGenerating] = useState(false);
+  const [started, setStarted] = useState(false);
 
-  const generate = () => {
+  const generate = (subjectOverride?: string) => {
+    const activeSubject = subjectOverride || subject;
     setGenerating(true);
     setChallenges([]);
+    setStarted(true);
     setTimeout(() => {
-      const generated = generateChallenges(subject, difficulty);
+      const generated = generateChallenges(activeSubject, difficulty);
       setChallenges(generated);
       setCurrentIdx(0);
       setSelected(null);
@@ -480,36 +517,76 @@ function DailyChallengesPanel() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div>
-        <h2 className="text-xl font-extrabold text-gray-900 mb-1">Daily Challenges</h2>
-        <p className="text-sm text-gray-500">Test your knowledge with quiz challenges</p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-orange-500 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+        </div>
+        <div>
+          <h2 className="text-base font-extrabold text-gray-900 leading-tight">Daily Challenges</h2>
+          <p className="text-xs text-gray-500">Practice makes perfect!</p>
+        </div>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl p-5 flex gap-3 flex-wrap items-end">
-        <div>
-          <label className="text-xs font-semibold text-gray-500 block mb-1.5">Subject</label>
-          <select value={subject} onChange={e => setSubject(e.target.value)} className="text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-            {['Mathematics', 'Science', 'English', 'History', 'Geography', 'Physics', 'Chemistry', 'Biology'].map(s => <option key={s}>{s}</option>)}
-          </select>
+      <div className="border-t border-gray-200 pt-5" />
+
+      {/* Stats Row */}
+      <div className="grid grid-cols-3 gap-4">
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f97316" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg>
+          <p className="text-2xl font-bold text-gray-900">0</p>
+          <p className="text-xs text-gray-500 mt-1">Day Streak</p>
         </div>
-        <div>
-          <label className="text-xs font-semibold text-gray-500 block mb-1.5">Difficulty</label>
-          <select value={difficulty} onChange={e => setDifficulty(e.target.value)} className="text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-            {['Easy', 'Medium', 'Hard'].map(d => <option key={d}>{d}</option>)}
-          </select>
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#eab308" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <p className="text-2xl font-bold text-gray-900">0</p>
+          <p className="text-xs text-gray-500 mt-1">Total XP</p>
         </div>
-        <button
-          onClick={generate}
-          disabled={generating}
-          className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50"
-        >
-          {generating ? 'Generating…' : 'Start Challenge'}
-        </button>
-        {challenges.length > 0 && (
-          <div className="ml-auto text-sm font-bold text-indigo-600">Score: {score}/{challenges.length}</div>
-        )}
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-center justify-center shadow-sm">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+          <p className="text-2xl font-bold text-gray-900">{started ? score : 0}</p>
+          <p className="text-xs text-gray-500 mt-1">Today</p>
+        </div>
       </div>
+
+      {/* Difficulty Toggle */}
+      <div>
+        <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">DIFFICULTY</p>
+        <div className="flex gap-2">
+          {['Easy', 'Medium', 'Hard'].map(d => (
+            <button key={d} onClick={() => setDifficulty(d)}
+              className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${difficulty === d ? 'bg-indigo-600 text-white shadow-sm' : 'bg-white border border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+              {d}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Category Grid */}
+      {!started && (
+        <div>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">PICK A CATEGORY</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {[
+              { name: 'Math', icon: '🧮', color: 'bg-blue-100', subject: 'Mathematics' },
+              { name: 'English', icon: '📖', color: 'bg-purple-100', subject: 'English' },
+              { name: 'Logic', icon: '🧠', color: 'bg-orange-100', subject: 'Science' },
+              { name: 'Coding', icon: '💻', color: 'bg-green-100', subject: 'Science' },
+              { name: 'Science', icon: '⚡', color: 'bg-yellow-100', subject: 'Science' },
+              { name: 'GK', icon: '🌐', color: 'bg-red-100', subject: 'History' },
+            ].map(cat => (
+              <button key={cat.name} onClick={() => { setSubject(cat.subject); generate(cat.subject); }}
+                disabled={generating}
+                className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-col items-start gap-3 hover:shadow-md hover:border-gray-300 transition-all disabled:opacity-50 shadow-sm">
+                <div className={`w-12 h-12 rounded-full ${cat.color} flex items-center justify-center text-xl`}>
+                  {cat.icon}
+                </div>
+                <p className="font-bold text-gray-900 text-sm">{cat.name}</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       {generating && (
         <div className="flex items-center justify-center py-12 gap-3 text-indigo-600">
@@ -521,11 +598,17 @@ function DailyChallengesPanel() {
       {challenges.length > 0 && currentIdx < challenges.length && challenge && (
         <div className="space-y-4">
           <div className="flex items-center justify-between text-sm text-gray-500">
-            <span>Question {currentIdx + 1} of {challenges.length}</span>
-            <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${difficulty === 'Easy' ? 'bg-emerald-100 text-emerald-700' : difficulty === 'Hard' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{difficulty}</span>
+            <div className="flex items-center gap-3">
+              <button onClick={() => { setStarted(false); setChallenges([]); }} className="text-xs text-indigo-600 font-medium hover:underline">← Back to categories</button>
+              <span>Question {currentIdx + 1} of {challenges.length}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${difficulty === 'Easy' ? 'bg-emerald-100 text-emerald-700' : difficulty === 'Hard' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{difficulty}</span>
+              <span className="text-xs font-bold text-indigo-600">Score: {score}/{challenges.length}</span>
+            </div>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl p-6">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
             <p className="text-base font-bold text-gray-900 mb-5">{challenge.question}</p>
             <div className="space-y-2.5">
               {challenge.options.map((opt, i) => {
@@ -569,7 +652,7 @@ function DailyChallengesPanel() {
             <div className="bg-indigo-50 border border-indigo-200 rounded-2xl p-6 text-center">
               <p className="text-2xl font-extrabold text-indigo-700 mb-1">{score}/{challenges.length}</p>
               <p className="text-sm text-indigo-600 mb-4">Challenge Complete!</p>
-              <button onClick={generate} className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors">
+              <button onClick={() => { setStarted(false); setChallenges([]); }} className="px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 transition-colors">
                 Try Again
               </button>
             </div>
